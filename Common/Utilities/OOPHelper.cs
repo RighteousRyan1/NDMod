@@ -10,7 +10,7 @@ namespace NDMod.Common.Utilities
 {
     public class OOPHelper
     {
-        public static Type[] AllTypes => Assembly.GetExecutingAssembly().GetTypes();
+        private static Type[] AllTypes => Assembly.GetExecutingAssembly().GetTypes();
         /// <summary>
         /// Get all classes that extend T.
         /// </summary>
@@ -18,17 +18,11 @@ namespace NDMod.Common.Utilities
         /// <returns>A List of all classes that extend T. </returns>
         public static List<T> GetSubclasses<T>() where T : class
         {
-            var Types = AllTypes;
+            var types = AllTypes;
             List<T> TypeListBuffer = new List<T>();
-
-            for (int Index = 0; Index < Types.Length; Index++)
-            {
-                if (Types[Index].IsSubclassOf(typeof(T)))
-                {
-                    TypeListBuffer.Add(Activator.CreateInstance(Types[Index]) as T);
-                }
-            }
-
+            for (int Index = 0; Index < types.Length; Index++)
+                if (types[Index].IsSubclassOf(typeof(T)))
+                    TypeListBuffer.Add(Activator.CreateInstance(types[Index]) as T);
             return TypeListBuffer;
         }
     }
