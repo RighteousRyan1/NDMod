@@ -2,27 +2,38 @@ using Terraria.ModLoader;
 using NDMod.Common.Utilities;
 using NDMod.Common;
 using System.Collections.Generic;
+using Terraria;
+using System;
 
 namespace NDMod
 {
-	public class NDMod : Mod
-	{
+    public class NDMod : Mod
+    {
         public static List<Disaster> Disasters { get; private set; } = new List<Disaster>();
-        private bool _newActiveDisaster;
-        private bool _oldActiveDisaster;
-        public override void PostUpdateEverything()
+        public override void PostSetupContent()
         {
             Disasters = OOPHelper.GetSubclasses<Disaster>();
+        }
+        public override void PostUpdateEverything()
+        {
             foreach (Disaster disaster in Disasters)
             {
-                _newActiveDisaster = disaster.Active;
-                if (_newActiveDisaster && !_oldActiveDisaster)
+                if (disaster.duration > 0) 
+                    disaster.duration--;
+                if (Main.rand.NextFloat() <= disaster.ChanceToOccur && !disaster.Active && disaster.CanActivate) {
+                    int rand = Main.rand.Next((int)(disaster.MaxDuration * 0.6f), disaster.MaxDuration);
+                    disaster.duration = rand;
+                }
+                if (disaster.GetBegin())
                     disaster.OnBegin();
-                else if (!_newActiveDisaster && _oldActiveDisaster)
+
+                if (disaster.GetEnd())
                     disaster.OnEnd();
+
                 if (disaster.Active)
                     disaster.UpdateActive(disaster);
-                _oldActiveDisaster = _newActiveDisaster;
+                else
+                    disaster.UpdateInactive(disaster);
             }
         }
     }
