@@ -4,6 +4,7 @@ using NDMod.Common;
 using System.Collections.Generic;
 using Terraria;
 using System;
+using Microsoft.Xna.Framework;
 
 namespace NDMod
 {
@@ -13,16 +14,26 @@ namespace NDMod
         public override void PostSetupContent()
         {
             Disasters = OOPHelper.GetSubclasses<Disaster>();
+
+            foreach (Disaster dis in Disasters)
+            {
+                ContentInstance.Register(dis);
+            }
+
+            On.Terraria.Rain.MakeRain += Rain_MakeRain;
         }
+
+        private void Rain_MakeRain(On.Terraria.Rain.orig_MakeRain orig)
+        {
+            orig();
+        }
+
         public override void PostUpdateEverything()
         {
             foreach (Disaster disaster in Disasters)
             {
-                if (disaster.duration > 0) 
-                    disaster.duration--;
                 if (Main.rand.NextFloat() <= disaster.ChanceToOccur && !disaster.Active && disaster.CanActivate) {
-                    int rand = Main.rand.Next((int)(disaster.MaxDuration * 0.6f), disaster.MaxDuration);
-                    disaster.duration = rand;
+                    disaster.ForcefullyBeginDisaster();
                 }
                 if (disaster.GetBegin())
                     disaster.OnBegin();

@@ -8,7 +8,7 @@ using System.Reflection;
 
 namespace NDMod.Common.Utilities
 {
-    public class OOPHelper
+    public sealed class OOPHelper
     {
         private static Type[] AllTypes => Assembly.GetExecutingAssembly().GetTypes();
         /// <summary>

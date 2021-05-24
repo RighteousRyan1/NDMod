@@ -3,15 +3,24 @@ using System.Linq;
 using Terraria;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna;
+using Terraria.ModLoader;
 
 namespace NDMod.Common
 {
+    /// <summary>
+    /// Make your own natural disaster!
+    /// <para></para>
+    /// You can change how it behaves, how long it stays active, whatever!
+    /// <para></para>
+    /// You can access any disaster using <code>ModContent.GetInstance</code>
+    /// </summary>
     public class Disaster
     {
         /// <summary>
         /// The current duration of the disaster. This is how much longer it will last for.
         /// </summary>
         public int duration;
+        public int cdTimer;
         public bool Active { get => duration > 0; }
         /// <summary>
         /// Choose what to do while your disaster is active!
@@ -27,7 +36,11 @@ namespace NDMod.Common
         /// Choose what should happen when the disaster ends.
         /// </summary>
         /// <returns>Whether or not something should happen.</returns>
-        public virtual bool OnEnd() => true;
+        public virtual bool OnEnd()
+        {
+            cdTimer = Cooldown;
+            return true;
+        }
         /// <summary>
         /// Do things while your disaster is not active. 
         /// <para></para>Do things like changing the chance of the disaster happening, or something else cool!
@@ -51,7 +64,12 @@ namespace NDMod.Common
         /// <summary>
         /// Determines whether or not this disaster can happen. <para></para>Set this to something like rain, a biome boolean, or anything of the sort to match your liking.
         /// </summary>
-        public virtual bool CanActivate => true;
+        public virtual bool CanActivate => cdTimer <= 0;
+
+        /// <summary>
+        /// Set this to any number. This number is how many ticks must pass before RFG can start randomly rolling this event again.
+        /// </summary>
+        public virtual int Cooldown => 0;
         /// <summary>
         /// Forcefully stops this disaster.
         /// </summary>
@@ -93,6 +111,15 @@ namespace NDMod.Common
             bool met = !_newActGetEnd && _oldActGetEnd;
             _oldActGetEnd = _newActGetEnd;
             return met;
+        }
+
+        internal void Update()
+        {
+            if (duration > 0)
+                duration--;
+
+            if (cdTimer > 0)
+                cdTimer--;
         }
     }
 }
