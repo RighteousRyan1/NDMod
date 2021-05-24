@@ -9,7 +9,7 @@ namespace NDMod.Core
 {
     public class DisasterIO : ModWorld
     {
-        public List<Disaster> activeDisasters = new List<Disaster>();
+        public List<ModDisaster> activeDisasters = new List<ModDisaster>();
         /*public override TagCompound Save()
         {
             foreach (Disaster disaster in NDMod.Disasters)

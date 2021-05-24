@@ -10,14 +10,15 @@ namespace NDMod
 {
     public class NDMod : Mod
     {
-        public static List<Disaster> Disasters { get; private set; } = new List<Disaster>();
+        public static List<ModDisaster> ModDisasters { get; private set; } = new List<ModDisaster>();
         public override void PostSetupContent()
         {
-            Disasters = OOPHelper.GetSubclasses<Disaster>();
+            ModDisasters = OOPHelper.GetSubclasses<ModDisaster>();
 
-            foreach (Disaster dis in Disasters)
+            foreach (ModDisaster dis in ModDisasters)
             {
                 ContentInstance.Register(dis);
+                dis.Initialize();
             }
 
             On.Terraria.Rain.MakeRain += Rain_MakeRain;
@@ -30,16 +31,9 @@ namespace NDMod
 
         public override void PostUpdateEverything()
         {
-            foreach (Disaster disaster in Disasters)
+            foreach (ModDisaster disaster in ModDisasters)
             {
-                if (Main.rand.NextFloat() <= disaster.ChanceToOccur && !disaster.Active && disaster.CanActivate) {
-                    disaster.ForcefullyBeginDisaster();
-                }
-                if (disaster.GetBegin())
-                    disaster.OnBegin();
-
-                if (disaster.GetEnd())
-                    disaster.OnEnd();
+                disaster.Update();
 
                 if (disaster.Active)
                     disaster.UpdateActive(disaster);

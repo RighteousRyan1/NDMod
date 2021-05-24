@@ -14,19 +14,27 @@ namespace NDMod.Common
     /// <para></para>
     /// You can access any disaster using <code>ModContent.GetInstance</code>
     /// </summary>
-    public class Disaster
+    public class ModDisaster
     {
         /// <summary>
         /// The current duration of the disaster. This is how much longer it will last for.
         /// </summary>
         public int duration;
         public int cdTimer;
+        /// <summary>
+        /// Put things you always want to update here.
+        /// </summary>
+        public virtual void UpdateAlways() { }
+        /// <summary>
+        /// Put all things you want to instantiate on Mod.Load() here.
+        /// </summary>
+        public virtual void Initialize() { }
         public bool Active { get => duration > 0; }
         /// <summary>
         /// Choose what to do while your disaster is active!
         /// </summary>
         /// <param name="disaster">This disaster.</param>
-        public virtual void UpdateActive(Disaster disaster) { }
+        public virtual void UpdateActive(ModDisaster disaster) { }
         /// <summary>
         /// Choose what should happen when the disaster begins.
         /// </summary>
@@ -46,13 +54,13 @@ namespace NDMod.Common
         /// <para></para>Do things like changing the chance of the disaster happening, or something else cool!
         /// </summary>
         /// <param name="disaster">This disaster.</param>
-        public virtual void UpdateInactive(Disaster disaster) { }
+        public virtual void UpdateInactive(ModDisaster disaster) { }
         /// <summary>
         /// Change the chance for this event to occur every in-game tick. <para></para>Closer to 0 means less common, closer to 1 means more common.
         /// </summary>
         public virtual float ChanceToOccur => 0f;
         /// <summary>
-        /// When this disaster begins, the duration set between MaxDuration * 0.6f and MaxDuration
+        /// When this disaster begins, the duration set between MaxDuration * SetDurationBounds(ref lowestPercentile) and MaxDuration
         /// </summary>
         public virtual int MaxDuration => 0;
         /// <summary>
@@ -71,6 +79,10 @@ namespace NDMod.Common
         /// </summary>
         public virtual int Cooldown => 0;
         /// <summary>
+        /// The minimum duration the disaster can last.
+        /// </summary>
+        public int MinDuration => 0;
+        /// <summary>
         /// Forcefully stops this disaster.
         /// </summary>
         public void ForcefullyStopDisaster()
@@ -78,11 +90,18 @@ namespace NDMod.Common
             duration = 0;
         }
         /// <summary>
+        /// Have a chance at naturally activating this event every X ticks. 
+        /// <para>
+        /// Not setting this or keeping it at 0 can make it hard to make good chances/rare chances of occurrance.
+        /// </para>
+        /// </summary>
+        public virtual int RandomUpdateTime => 0;
+        /// <summary>
         /// Forcefully begins this disaster.
         /// </summary>
         public void ForcefullyBeginDisaster()
         {
-            int rand = Main.rand.Next((int)(MaxDuration * 0.6f), MaxDuration);
+            int rand = Main.rand.Next(MinDuration, MaxDuration + 1);
             duration = rand;
         }
 
@@ -120,6 +139,20 @@ namespace NDMod.Common
 
             if (cdTimer > 0)
                 cdTimer--;
+            if (Main.GameUpdateCount % RandomUpdateTime == 0)
+            {
+                if (Main.rand.NextFloat() <= ChanceToOccur && !Active && CanActivate)
+                {
+                    ForcefullyBeginDisaster();
+                }
+            }
+            if (GetBegin())
+                OnBegin();
+
+            if (GetEnd())
+                OnEnd();
+
+            UpdateAlways();
         }
     }
 }
