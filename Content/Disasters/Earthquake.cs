@@ -106,5 +106,6 @@ namespace NDMod.Content.Disasters
             SFXICrumble.Volume = 0f;
         }
         public override bool ShouldTownNPCsGoToHomes => true;
+        public override bool CanActivate => ModContent.GetInstance<DisasterConfig>().disasterEnabled_Earthquakes;
     }
 }

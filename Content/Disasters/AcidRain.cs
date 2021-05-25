@@ -69,7 +69,7 @@ namespace NDMod.Content.Disasters
             }
         }
         public override string Name => "Acid Rain";
-        public override bool CanActivate => Main.raining;
+        public override bool CanActivate => Main.raining && ModContent.GetInstance<DisasterConfig>().disasterEnabled_AcidRain;
         public override int Cooldown => 64000;
         public override int MinDuration => 3000;
         public override void UpdateAlways()

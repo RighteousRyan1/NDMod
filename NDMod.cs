@@ -37,33 +37,49 @@ namespace NDMod
 
         private void GoToHomes(ILContext il)
         {
+            /*
+                * Header Size: 12 bytes
+                * Code Size: 22134 (0x5676) bytes
+                * LocalVarSig Token: 0x1100017D RID: 381
+                * .maxstack 11
+                * .locals init (
+                * [0] int32 maxValue,
+                * [1] bool flag,
+                */
+
+            // bool flag = Main.raining;
+            //IL_0006: ldsfld bool Terraria.Main::raining // push Main.raining
+            //IL_000b: stloc.1 // assign
+            // if (!Main.dayTime) // other checks
+            //IL_000c: ldsfld bool Terraria.Main::dayTime
+            //IL_0011: brtrue.s IL_0015
+            // ...
+
+            ILCursor c = new ILCursor(il);
+            if (!c.TryGotoNext(i => i.MatchStloc(1))) // match the 'bool flag = Main.raining' (the assignment)
+            {
+                // IL failed
+                return;
+            }
+
+            // the boolean of Main.raining is still on the stack
+            c.EmitDelegate<Func<bool, bool>>(raining =>
+            {
+                return raining || AnyDisasterReturnsNPCHome();
+            });
+            // now it would act like 'bool flag = Main.raining || AnyDisasterReturnsNPCHome()'
+        }
+
+        private static bool AnyDisasterReturnsNPCHome()
+        {
             foreach (ModDisaster disaster in ModDisasters)
             {
-                // Here you go lolxd
-                if (disaster.ShouldTownNPCsGoToHomes && disaster.Active)
+                if (disaster.Active && disaster.ShouldTownNPCsGoToHomes)
                 {
-                    var c = new ILCursor(il);
-
-                    /*
-                     * Header Size: 12 bytes
-                     * Code Size: 22134 (0x5676) bytes
-                     * LocalVarSig Token: 0x1100017D RID: 381
-                     * .maxstack 11
-                     * .locals init (
-                     * [0] int32 maxValue,
-                     * [1] bool flag,
-                     */
-                    bool canGoto = c.TryGotoNext(x => x.MatchLdloc(1)); // match flag, the boolean tracking movements back to houses.
-                    if (canGoto)
-                    {
-                        var op = OpCodes.Pop;
-
-                        // c.EmitDelegate<Func<bool>>(() => 
-                    }
-                    else
-                        return;
+                    return true;
                 }
             }
+            return false;
         }
 
         public override void PreSaveAndQuit()
