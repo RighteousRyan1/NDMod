@@ -1,3 +1,4 @@
 displayName = NaturalDisasters
 author = Ryan, and maybe others
 version = 0.1
+includePDB = true

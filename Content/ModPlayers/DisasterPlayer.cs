@@ -2,14 +2,22 @@ using Terraria.ModLoader;
 using Terraria;
 using Microsoft.Xna.Framework;
 using NDMod.Common.Utilities;
+using NDMod.Content.Disasters;
+using NDMod.Content.Buffs;
+using Microsoft.Xna.Framework.Input;
 
 namespace NDMod.Content.ModPlayers
 {
     public class DisasterPlayer : ModPlayer
     {
+        public static bool ViewingDisastersScroll { get; set; }
         public override void ModifyScreenPosition()
         {
             var equake = ModContent.GetInstance<Earthquake>();
+            var fld = ModContent.GetInstance<Flood>();
+            var aRain = ModContent.GetInstance<AcidRain>();
+
+
             float rand1 = Main.rand.NextFloat(0, Earthquake.quakeSeverity);
             float rand2 = Main.rand.NextFloat(0, Earthquake.quakeSeverity);
             float d = Vector2.Distance(Main.screenPosition, Main.screenPosition + new Vector2(rand1, rand2));
@@ -23,14 +31,35 @@ namespace NDMod.Content.ModPlayers
             }
             else if (d > 1.25f)
                 Main.screenPosition += new Vector2(Main.rand.NextFloat(0, Earthquake.quakeSeverity), Main.rand.NextFloat(0, Earthquake.quakeSeverity));
-
-            if (Main.keyState.IsKeyDown(Microsoft.Xna.Framework.Input.Keys.End) && !Main.oldKeyState.IsKeyDown(Microsoft.Xna.Framework.Input.Keys.End))
+        }
+        public override void PostUpdate()
+        {
+            var equake = ModContent.GetInstance<Earthquake>();
+            var fld = ModContent.GetInstance<Flood>();
+            var aRain = ModContent.GetInstance<AcidRain>();
+            if (Main.keyState.OnKeyPressed(Keys.End))
             {
-                equake.ForcefullyStopDisaster();
+                aRain.ForcefullyStopDisaster();
+                // equake.ForcefullyStopDisaster();
+                // fld.ForcefullyStopDisaster();
             }
-            if (Main.keyState.IsKeyDown(Microsoft.Xna.Framework.Input.Keys.Home) && !Main.oldKeyState.IsKeyDown(Microsoft.Xna.Framework.Input.Keys.Home))
+            if (Main.keyState.OnKeyPressed(Keys.Home))
             {
-                equake.ForcefullyBeginDisaster();
+                aRain.ForcefullyBeginDisaster();
+                // equake.ForcefullyBeginDisaster();
+                //fld.ForcefullyBeginDisaster();
+            }
+        }
+        public override void PostUpdateBuffs()
+        {
+        }
+        public override void DrawEffects(PlayerDrawInfo drawInfo, ref float r, ref float g, ref float b, ref float a, ref bool fullBright)
+        {
+            if (player.HasBuff(ModContent.BuffType<AcidBurns>()))
+            {
+                r = 0.6f;
+                g = 1f;
+                b = 0.6f;
             }
         }
     }

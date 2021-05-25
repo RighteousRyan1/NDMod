@@ -22,7 +22,14 @@ namespace NDMod.Common
         public int duration;
         public int cdTimer;
         /// <summary>
-        /// Put things you always want to update here.
+        /// Put the things in here you wish to do when the player saves and quits.
+        /// </summary>
+        public virtual void SaveAndQuit()
+        {
+
+        }
+        /// <summary>
+        /// Put things you always want to update here. This runs both when active and inactive.
         /// </summary>
         public virtual void UpdateAlways() { }
         /// <summary>
@@ -81,7 +88,7 @@ namespace NDMod.Common
         /// <summary>
         /// The minimum duration the disaster can last.
         /// </summary>
-        public int MinDuration => 0;
+        public virtual int MinDuration => 0;
         /// <summary>
         /// Forcefully stops this disaster.
         /// </summary>
@@ -95,7 +102,7 @@ namespace NDMod.Common
         /// Not setting this or keeping it at 0 can make it hard to make good chances/rare chances of occurrance.
         /// </para>
         /// </summary>
-        public virtual int RandomUpdateTime => 0;
+        public virtual int RandomUpdateTime => 1;
         /// <summary>
         /// Forcefully begins this disaster.
         /// </summary>

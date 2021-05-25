@@ -9,8 +9,10 @@ using System.Diagnostics;
 using Microsoft.Xna.Framework.Audio;
 using Terraria.ModLoader;
 using NDMod.Content.ModPlayers;
+using NDMod.Common;
+using NDMod.Common.Utilities;
 
-namespace NDMod.Common.Utilities
+namespace NDMod.Content.Disasters
 {
     public class Earthquake : ModDisaster
     {
@@ -20,14 +22,17 @@ namespace NDMod.Common.Utilities
         public override int MaxDuration => 2000;
         public override float ChanceToOccur => 0.025f;
         public override int RandomUpdateTime => 300;
+        public override int MinDuration => 1000;
         public override bool OnEnd()
         {
-            Main.NewText("The ground has quit trembling.", Color.Orange);
+            string msg = CommonUtils.Pick("The ground has quit trembling.", "The earth settles...");
+            Main.NewText(msg, Color.Orange);
             return base.OnEnd();
         }
         public override bool OnBegin()
         {
-            Main.NewText("An earthquake! Get somewhere safe!", Color.BlueViolet);
+            string msg = CommonUtils.Pick("An earthquake! Get somewhere safe!", "The earth is unsettled!");
+            Main.NewText(msg, Color.BlueViolet);
             return base.OnBegin();
         }
         /// <summary>
@@ -52,7 +57,6 @@ namespace NDMod.Common.Utilities
                     //Main.NewText("Safe, Going to " + _achieve);
                 }
             }
-
             MathMethods.RoughStep(ref quakeSeverity, _achieve, 0.05f);
             // Main.NewText($"Severe: {quakeSeverity}");
             if (Math.Abs(quakeSeverity) >= 15)
@@ -64,16 +68,11 @@ namespace NDMod.Common.Utilities
                     {
                         for (int y = (int)player.Center.Y / 16 - 40; y < (int)player.Center.Y / 16 + 40; y++)
                         {
-                            // Tile tile = Main.tile[x, y];
-                            bool chooseBreak = Main.rand.NextFloat() < (0.01f * (quakeSeverity / 8));
+                            bool chooseBreak = Main.rand.NextFloat() < (0.035f * (quakeSeverity / 8));
 
                             if (chooseBreak)
                             {
                                 player.PickTile(x, y, (int)Math.Round(quakeSeverity) * 5);
-                            }
-                            else
-                            {
-                                player.PickTile(x, y, 1);
                             }
                         }
                     }
