@@ -5,6 +5,8 @@ using NDMod.Common.Utilities;
 using NDMod.Content.Disasters;
 using NDMod.Content.Buffs;
 using Microsoft.Xna.Framework.Input;
+using Terraria.ID;
+using Terraria.DataStructures;
 
 namespace NDMod.Content.ModPlayers
 {
@@ -39,18 +41,46 @@ namespace NDMod.Content.ModPlayers
             var aRain = ModContent.GetInstance<AcidRain>();
             if (Main.keyState.OnKeyPressed(Keys.End))
             {
-                aRain.ForcefullyStopDisaster();
+                equake.ForcefullyStopDisaster();
                 // equake.ForcefullyStopDisaster();
                 // fld.ForcefullyStopDisaster();
             }
             if (Main.keyState.OnKeyPressed(Keys.Home))
             {
-                aRain.ForcefullyBeginDisaster();
+                equake.ForcefullyBeginDisaster();
                 // equake.ForcefullyBeginDisaster();
                 //fld.ForcefullyBeginDisaster();
             }
         }
         public override void PostUpdateBuffs()
+        {
+            bool HB(int type)
+            {
+                return player.HasBuff(type);
+            }
+            var vol = AcidRain.SFXISizzle.Volume;
+            if (HB(ModContent.BuffType<AcidBurns>()))
+            {
+                AcidRain.SFXISizzle.Volume += 0.001f;
+                if (AcidRain.SFXISizzle.Volume > 0.075f)
+                    AcidRain.SFXISizzle.Volume = 0.075f;
+            }
+            else
+            {
+                AcidRain.SFXISizzle.Volume = 0f;
+            }
+
+        }
+        public override bool PreKill(double damage, int hitDirection, bool pvp, ref bool playSound, ref bool genGore, ref PlayerDeathReason damageSource)
+        {
+            if (player.HasBuff(ModContent.BuffType<AcidBurns>()))
+            {
+                string pick = CommonUtils.Pick($"{player.name} rotted away from acid.", $"{player.name} couldn't handle the acid burn.", $"{player.name} let themselves rot out.");
+                damageSource.SourceCustomReason = pick;
+            }
+            return base.PreKill(damage, hitDirection, pvp, ref playSound, ref genGore, ref damageSource);
+        }
+        public override void Kill(double damage, int hitDirection, bool pvp, PlayerDeathReason damageSource)
         {
         }
         public override void DrawEffects(PlayerDrawInfo drawInfo, ref float r, ref float g, ref float b, ref float a, ref bool fullBright)

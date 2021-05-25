@@ -10,11 +10,14 @@ using NDMod.Common;
 using Terraria.ModLoader;
 using NDMod.Content.Buffs;
 using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Audio;
 
 namespace NDMod.Content.Disasters
 {
     public class AcidRain : ModDisaster
     {
+        public static SoundEffect SFXSizzle;
+        public static SoundEffectInstance SFXISizzle;
         public override int MaxDuration => 6000;
         public override float ChanceToOccur => 0.0001f;
         public override bool OnEnd()
@@ -29,6 +32,8 @@ namespace NDMod.Content.Disasters
         }
         public override void UpdateActive(ModDisaster disaster)
         {
+            // def = 0.16f
+            Main.maxRaining = 1f;
             Texture2D acidRain = ModContent.GetInstance<NDMod>().GetTexture("Assets/Textures/AcidRain");
             if (Main.rainTexture == rainTex)
                 Main.rainTexture = acidRain;
@@ -75,11 +80,19 @@ namespace NDMod.Content.Disasters
         public static Texture2D rainTex;
         public override void Initialize()
         {
+            Mod mod = ModContent.GetInstance<NDMod>();
             rainTex = Main.rainTexture;
+
+            SFXSizzle = mod.GetSound("Assets/SoundEffects/Sizzle");
+            SFXISizzle = SFXSizzle.CreateInstance();
+            SFXISizzle.IsLooped = true;
+            SFXISizzle.Play();
+            SFXISizzle.Volume = 0f;
         }
         public override void SaveAndQuit()
         {
             Main.rainTexture = rainTex;
         }
+        public override bool ShouldTownNPCsGoToHomes => true;
     }
 }

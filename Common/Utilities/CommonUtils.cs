@@ -37,7 +37,7 @@ namespace NDMod.Common.Utilities
 
         public static T Pick<T>(params T[] values)
         {
-            return values[Main.rand.Next(values.Length)];
+            return Main.rand.Next(values);
         }
     }
 }

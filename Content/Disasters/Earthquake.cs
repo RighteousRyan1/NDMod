@@ -105,5 +105,6 @@ namespace NDMod.Content.Disasters
             SFXICrumble.Play();
             SFXICrumble.Volume = 0f;
         }
+        public override bool ShouldTownNPCsGoToHomes => true;
     }
 }

@@ -22,12 +22,13 @@ namespace NDMod.Common
         public int duration;
         public int cdTimer;
         /// <summary>
+        /// Set this if you want NPCs to go home during this disaster. False by default.
+        /// </summary>
+        public virtual bool ShouldTownNPCsGoToHomes => false;
+        /// <summary>
         /// Put the things in here you wish to do when the player saves and quits.
         /// </summary>
-        public virtual void SaveAndQuit()
-        {
-
-        }
+        public virtual void SaveAndQuit() { }
         /// <summary>
         /// Put things you always want to update here. This runs both when active and inactive.
         /// </summary>
