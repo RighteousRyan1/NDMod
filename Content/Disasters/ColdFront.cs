@@ -21,14 +21,10 @@ namespace NDMod.Content.Disasters
         public override float ChanceToOccur => 0.025f;
         public override bool OnEnd()
         {
-            var msg = CommonUtils.Pick("The cold front has left the snowy areas.", "The cold front has depleted.");
-            Main.NewText(msg, Color.LightBlue);
             return base.OnEnd();
         }
         public override bool OnBegin()
         {
-            var msg = CommonUtils.Pick("The snowy air is extra nippy...", "A cold front is sweeping through the snow.");
-            Main.NewText(msg, Color.PowderBlue);
             return base.OnBegin();
         }
         public override void UpdateActive(ModDisaster disaster)

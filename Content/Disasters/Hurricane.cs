@@ -26,18 +26,16 @@ namespace NDMod.Content.Disasters
         {
             _timerWindSpeedChange = 300;
             _windSpeedApproachable = Main.rand.NextFloat(-0.5f, 0.5f);
-            Main.NewText("The wind is getting lighter.", Color.DarkSlateBlue);
             return base.OnEnd();
         }
         public override bool OnBegin()
         {
-            _windSpeedApproachable = Main.rand.NextFloat(-5f, 5f);
+            _windSpeedApproachable = Main.rand.NextFloat(-3f, 3f);
 
             if (_windSpeedApproachable > -2f && _windSpeedApproachable <= 0)
                 _windSpeedApproachable = -4f;
             else if (_windSpeedApproachable > 0)
                 _windSpeedApproachable = 2f;
-            Main.NewText("The wind is starting to speed!", Color.DarkBlue);
             return base.OnBegin();
         }
         public override void UpdateActive(ModDisaster disaster)
@@ -48,8 +46,8 @@ namespace NDMod.Content.Disasters
             for (int i = 0; i < Main.ActivePlayersCount; i++)
             {
                 var player = Main.player[i];
-
-                player.AddBuff(BuffID.WindPushed, 2, true);
+                if (!player.behindBackWall && player.ZoneOverworldHeight)
+                    player.AddBuff(BuffID.WindPushed, 2, true);
             }
 
             MathMethods.RoughStep(ref Main.windSpeed, _windSpeedApproachable, 0.0025f);

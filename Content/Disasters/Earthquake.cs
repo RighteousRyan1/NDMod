@@ -24,14 +24,10 @@ namespace NDMod.Content.Disasters
         public override int MinDuration => 5000;
         public override bool OnEnd()
         {
-            string msg = CommonUtils.Pick("The ground has quit trembling.", "The earth settles...");
-            Main.NewText(msg, Color.Orange);
             return base.OnEnd();
         }
         public override bool OnBegin()
         {
-            string msg = CommonUtils.Pick("An earthquake! Get somewhere safe!", "The earth is unsettled!");
-            Main.NewText(msg, Color.BlueViolet);
             return base.OnBegin();
         }
         /// <summary>

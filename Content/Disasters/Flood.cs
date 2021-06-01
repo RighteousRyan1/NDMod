@@ -17,12 +17,10 @@ namespace NDMod.Content.Disasters
         public override float ChanceToOccur => 0.0001f;
         public override bool OnEnd()
         {
-            Main.NewText("The ground has stopped flooding.", Color.LightSkyBlue);
             return base.OnEnd();
         }
         public override bool OnBegin()
         {
-            Main.NewText("Oh no! It's starting to flood!", Color.LightBlue);
             return base.OnBegin();
         }
         private bool wasActive;

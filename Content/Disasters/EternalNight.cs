@@ -21,12 +21,10 @@ namespace NDMod.Content.Disasters
         public static int bgStopModifyTimer;
         public override bool OnEnd()
         {
-            Main.NewText("The world lightens...", Color.White);
             return base.OnEnd();
         }
         public override bool OnBegin()
         {
-            Main.NewText("The world darkens...", Color.DarkGray);
             return base.OnBegin();
         }
         public override void UpdateActive(ModDisaster disaster)

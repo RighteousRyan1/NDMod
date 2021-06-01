@@ -20,12 +20,10 @@ namespace NDMod.Content.Disasters
         public override float ChanceToOccur => 0.000025f;
         public override bool OnEnd()
         {
-            Main.NewText("The solar flare has passed.", Color.LightYellow);
             return base.OnEnd();
         }
         public override bool OnBegin()
         {
-            Main.NewText("A solar flare has hit the world!", Color.Yellow);
             return base.OnBegin();
         }
         public override void UpdateActive(ModDisaster disaster)

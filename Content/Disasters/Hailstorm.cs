@@ -20,12 +20,10 @@ namespace NDMod.Content.Disasters
         public override float ChanceToOccur => 0.00001f;
         public override bool OnEnd()
         {
-            Main.NewText("The chunks of ice have quit falling.", Color.SkyBlue);
             return base.OnEnd();
         }
         public override bool OnBegin()
         {
-            Main.NewText("Seems like the rain is hardening...", Color.LightSkyBlue);
             return base.OnBegin();
         }
         public override void UpdateActive(ModDisaster disaster)

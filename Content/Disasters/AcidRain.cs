@@ -22,12 +22,10 @@ namespace NDMod.Content.Disasters
         public override float ChanceToOccur => 0.000015f;
         public override bool OnEnd()
         {
-            Main.NewText("The skies no longer pour down acid.", Color.DarkGreen);
             return base.OnEnd();
         }
         public override bool OnBegin()
         {
-            Main.NewText("The skies are pouring down acid!", Color.Chartreuse);
             return base.OnBegin();
         }
         public override void UpdateActive(ModDisaster disaster)
