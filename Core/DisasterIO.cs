@@ -4,34 +4,46 @@ using Terraria;
 using System.Collections.Generic;
 using Terraria.ModLoader.IO;
 using NDMod.Common;
+using System.Linq;
 
 namespace NDMod.Core
 {
     public class DisasterIO : ModWorld
     {
-        public List<ModDisaster> activeDisasters = new List<ModDisaster>();
-        /*public override TagCompound Save()
+        public Dictionary<string, int> nameDurations = new Dictionary<string, int>();
+        public override TagCompound Save()
         {
-            foreach (Disaster disaster in NDMod.Disasters)
+            nameDurations.Clear();
+            foreach (ModDisaster disaster in NDMod.ModDisasters)
             {
                 if (disaster.Active)
                 {
-                    activeDisasters.Add(disaster);
+                    nameDurations.Add(disaster.Name, disaster.duration);
                 }
+
+                disaster.duration = 0;
             }
 
             return new TagCompound()
             {
-                { "activeDisasters", activeDisasters}
+                { "dName", nameDurations.Keys.ToList() },
+                { "dDuration", nameDurations.Values.ToList() }
             };
         }
         public override void Initialize()
         {
-            activeDisasters = new List<Disaster>();
+            nameDurations.Clear();
         }
         public override void Load(TagCompound tag)
         {
-            tag.Get<List<Disaster>>("activeDisasters");
-        }*/
+            var names = tag.Get<List<string>>("dName");
+            var values = tag.Get<List<int>>("dDuration");
+            for (int i = 0; i < names.Count; i++)
+            {
+                var disaster = NDMod.ModDisasters.FirstOrDefault(d => d.Name == names[i]);
+                if (disaster != default)
+                    disaster.duration = values[i];
+            }
+        }
     }
 }

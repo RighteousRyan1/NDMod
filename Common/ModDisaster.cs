@@ -4,6 +4,7 @@ using Terraria;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna;
 using Terraria.ModLoader;
+using Terraria.ModLoader.IO;
 
 namespace NDMod.Common
 {
@@ -16,6 +17,9 @@ namespace NDMod.Common
     /// </summary>
     public class ModDisaster
     {
+        public virtual TagCompound Save() => null;
+        public virtual void Load(TagCompound tag) { }
+        public Mod mod => ModLoader.Mods.First(mod => mod.Code == GetType().Assembly);
         /// <summary>
         /// The current duration of the disaster. This is how much longer it will last for.
         /// </summary>
@@ -89,30 +93,35 @@ namespace NDMod.Common
         /// <summary>
         /// The minimum duration the disaster can last.
         /// </summary>
-        public virtual int MinDuration => 0;
+        public virtual int MinDuration => 1;
         /// <summary>
         /// Forcefully stops this disaster.
         /// </summary>
-        public void ForcefullyStopDisaster()
-        {
-            duration = 0;
-        }
+        public void End() => duration = 0;
         /// <summary>
         /// Have a chance at naturally activating this event every X ticks. 
         /// <para>
-        /// Not setting this or keeping it at 0 can make it hard to make good chances/rare chances of occurrance.
+        /// Not setting this or keeping it at 1 can make it hard to make good chances/rare chances of occurrance.
         /// </para>
-        /// </summary>
-        public virtual int RandomUpdateTime => 1;
+        /// </summary> 
+        // Should this be kept?
+        // public virtual int RandomUpdateTime => 1;
+
         /// <summary>
-        /// Forcefully begins this disaster.
+        /// Tries to begin the disaster. If it cannot begin, an error message will be printed into chat.
         /// </summary>
-        public void ForcefullyBeginDisaster()
+        public bool TryBegin()
         {
+            if (!CanActivate)
+            {
+                Main.NewTextMultiline($"Failed to start the {GetType().Name} ({Name}) disaster. It cannot be activated." 
+                    + $"\nDid you mean to set CanActivate differently?", true, Color.Red);
+                return false;
+            }
             int rand = Main.rand.Next(MinDuration, MaxDuration + 1);
             duration = rand;
+            return true;
         }
-
         private bool _oldActGetBegin;
         private bool _newActGetBegin;
         private bool _oldActGetEnd;
@@ -139,7 +148,6 @@ namespace NDMod.Common
             _oldActGetEnd = _newActGetEnd;
             return met;
         }
-
         internal void Update()
         {
             if (duration > 0)
@@ -147,20 +155,26 @@ namespace NDMod.Common
 
             if (cdTimer > 0)
                 cdTimer--;
-            if (Main.GameUpdateCount % RandomUpdateTime == 0)
+
+            // Every 150 ticks, attempt at starting any valid disaster.
+            if (Main.GameUpdateCount % 150 /*RandomUpdateTime*/ == 0)
             {
                 if (Main.rand.NextFloat() <= ChanceToOccur && !Active && CanActivate)
                 {
-                    ForcefullyBeginDisaster();
+                    TryBegin();
                 }
             }
-            if (GetBegin())
+            var isDoneJoining = Main.LocalPlayer.GetModPlayer<Content.ModPlayers.DisasterPlayer>().joiningWorldTimer <= 0;
+            if (GetBegin() && isDoneJoining)
                 OnBegin();
 
-            if (GetEnd())
+            if (GetEnd() && isDoneJoining)
                 OnEnd();
 
             UpdateAlways();
+
+            if (!CanActivate && Active)
+                End();
         }
     }
 }

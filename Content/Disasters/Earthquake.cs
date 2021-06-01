@@ -19,10 +19,9 @@ namespace NDMod.Content.Disasters
         public static SoundEffect SFXCrumble;
         public static SoundEffectInstance SFXICrumble;
         public static float quakeSeverity;
-        public override int MaxDuration => 2000;
-        public override float ChanceToOccur => 0.025f;
-        public override int RandomUpdateTime => 300;
-        public override int MinDuration => 1000;
+        public override int MaxDuration => 5500;
+        public override float ChanceToOccur => 0.001f;
+        public override int MinDuration => 5000;
         public override bool OnEnd()
         {
             string msg = CommonUtils.Pick("The ground has quit trembling.", "The earth settles...");
@@ -45,7 +44,7 @@ namespace NDMod.Content.Disasters
             Player player = Main.player[Main.myPlayer].GetModPlayer<DisasterPlayer>().player;
             // Activity is handled in a ModPlayer.
 
-            bool getUnusuallyHighQuakeScale = Main.rand.NextFloat() < 0.1f;
+            bool getUnusuallyHighQuakeScale = Main.rand.NextFloat() < 0.175f;
             if (Main.GameUpdateCount % 150 == 0)
             {
                 if (getUnusuallyHighQuakeScale) {
@@ -80,7 +79,7 @@ namespace NDMod.Content.Disasters
             }
         }
         public override string Name => "Earthquake";
-        public override int Cooldown => 10 * 60 * 60;
+        public override int Cooldown => 1500;
         public override void UpdateInactive(ModDisaster disaster)
         {
             _achieve = 0;
@@ -99,11 +98,14 @@ namespace NDMod.Content.Disasters
         public override void Initialize()
         {
             var mod = ModContent.GetInstance<NDMod>();
-            SFXCrumble = mod.GetSound("Assets/SoundEffects/Quake");
-            SFXICrumble = SFXCrumble.CreateInstance();
-            SFXICrumble.IsLooped = true;
-            SFXICrumble.Play();
-            SFXICrumble.Volume = 0f;
+            if (!Main.dedServ)
+            {
+                SFXCrumble = mod.GetSound("Assets/SoundEffects/Quake");
+                SFXICrumble = SFXCrumble.CreateInstance();
+                SFXICrumble.IsLooped = true;
+                SFXICrumble.Play();
+                SFXICrumble.Volume = 0f;
+            }
         }
         public override bool ShouldTownNPCsGoToHomes => true;
         public override bool CanActivate => ModContent.GetInstance<DisasterConfig>().disasterEnabled_Earthquakes;

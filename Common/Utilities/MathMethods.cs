@@ -33,5 +33,24 @@ namespace NDMod.Common.Utilities
 
 			return value;
 		}
+		public static Color ColorStep(ref Color value, Color goal, byte step)
+        {
+			if (value.R > goal.R)
+				value.R -= step;
+			else
+				value.R += step;
+
+			if (value.G > goal.G)
+				value.G -= step;
+			else
+				value.G += step;
+
+			if (value.B > goal.B)
+				value.B -= step;
+			else
+				value.B += step;
+
+			return value;
+		}
 	}
 }

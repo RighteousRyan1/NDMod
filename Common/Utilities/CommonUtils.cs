@@ -2,10 +2,10 @@ using System;
 using System.Linq;
 using Terraria;
 using Microsoft.Xna.Framework;
-using Microsoft.Xna;
 using System.Collections.Generic;
-using System.Reflection;
 using Microsoft.Xna.Framework.Input;
+using ReLogic.Graphics;
+using Terraria.ModLoader;
 
 namespace NDMod.Common.Utilities
 {
@@ -38,6 +38,11 @@ namespace NDMod.Common.Utilities
         public static T Pick<T>(params T[] values)
         {
             return Main.rand.Next(values);
+        }
+
+        public static (int, int) GetScreenCenter()
+        {
+            return (Main.screenWidth / 2, Main.screenHeight / 2);
         }
     }
 }

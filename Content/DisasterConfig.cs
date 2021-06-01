@@ -16,5 +16,9 @@ namespace NDMod.Content
 		[Label("Acid Rain")]
 		[DefaultValue(true)]
 		public bool disasterEnabled_AcidRain;
+
+		[Label("Cold Front")]
+		[DefaultValue(true)]
+		public bool disasterEnabled_ColdFront;
 	}
 }

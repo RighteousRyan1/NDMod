@@ -7,13 +7,14 @@ using System.Collections.Generic;
 using System.Reflection;
 using Terraria.ID;
 using NDMod.Common;
+using Terraria.ModLoader;
 
 namespace NDMod.Content.Disasters
 {
     public class Flood : ModDisaster
     {
-        public override int MaxDuration => 6000;
-        public override float ChanceToOccur => 0.0005f;
+        public override int MaxDuration => 9000;
+        public override float ChanceToOccur => 0.0001f;
         public override bool OnEnd()
         {
             Main.NewText("The ground has stopped flooding.", Color.LightSkyBlue);
@@ -28,6 +29,10 @@ namespace NDMod.Content.Disasters
         private bool isActive;
         public override void UpdateActive(ModDisaster disaster)
         {
+            if (!ModContent.GetInstance<AcidRain>().Active)
+            {
+                Main.maxRaining = 0.8f;
+            }
             var p = Main.player[Main.myPlayer];
 
             foreach (Rain rain in Main.rain)
@@ -42,38 +47,35 @@ namespace NDMod.Content.Disasters
                         int posy = (int)pos.Y;
                         int tposx = posx / 16;
                         int tposy = posy / 16;
-                        var t = Main.tile[tposx, tposy - 2];
+                        var t = Main.tile[tposx, tposy - 1];
                         var tileBelow = Framing.GetTileSafely(tposx, tposy + 1);
 
-                        isActive = tileBelow.active() && tileBelow.collisionType == 1;
+                        isActive = (tileBelow.active() && tileBelow.collisionType == 1) || tileBelow.liquid > 0;
 
                         if (isActive && !wasActive)
                         {
-                            Main.PlaySound(SoundID.PlayerHit, pos);
-
-                            p.Center = new Vector2(posx, posy);
-                            Main.NewText($"Coords: {pos} | TileCoords: {new Vector2(tposx, tposy)}");
                             t.liquidType(0);
-                            t.liquid = 1;
-                            WorldGen.SquareTileFrame(tposx, tposy - 2);
-                            WorldGen.DiamondTileFrame(tposx, tposy - 2);
-                            if (Main.dedServ)
+                            t.liquid = 255;
+                            WorldGen.SquareTileFrame(tposx, tposy - 1);
+                            WorldGen.DiamondTileFrame(tposx, tposy - 1);
+                            if (Main.netMode == NetmodeID.MultiplayerClient)
                             {
-                                NetMessage.sendWater(tposx, tposy);
+                                NetMessage.sendWater(tposx, tposy - 1);
                             }
                             else
                             {
-                                Liquid.AddWater(tposx, tposy);
+                                Liquid.AddWater(tposx, tposy - 1);
                             }
+                            Liquid.UpdateLiquid();
                         }
 
                         wasActive = isActive;
                     }
                 }
             }
-		}
+        }
         public override string Name => "Flooding";
-        public override bool CanActivate => false;// Main.raining;
-        public override int Cooldown => 1000;
+        public override bool CanActivate => Main.raining;
+        public override int Cooldown => 3000;
     }
 }

@@ -5,12 +5,13 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna;
 using System.Collections.Generic;
 using System.Reflection;
+using Terraria.ModLoader;
 
 namespace NDMod.Common.Utilities
 {
     public sealed class OOPHelper
     {
-        private static Type[] AllTypes => Assembly.GetExecutingAssembly().GetTypes();
+        private static Type[] AllTypes => ModLoader.Mods.Skip(1).SelectMany(mod => mod.Code.GetTypes()).ToArray();
         /// <summary>
         /// Get all classes that extend T.
         /// </summary>

@@ -18,8 +18,8 @@ namespace NDMod.Content.Disasters
     {
         public static SoundEffect SFXSizzle;
         public static SoundEffectInstance SFXISizzle;
-        public override int MaxDuration => 6000;
-        public override float ChanceToOccur => 0.0001f;
+        public override int MaxDuration => 12000;
+        public override float ChanceToOccur => 0.000015f;
         public override bool OnEnd()
         {
             Main.NewText("The skies no longer pour down acid.", Color.DarkGreen);
@@ -33,7 +33,7 @@ namespace NDMod.Content.Disasters
         public override void UpdateActive(ModDisaster disaster)
         {
             // def = 0.16f
-            Main.maxRaining = 1f;
+            Main.maxRaining = 0.6f;
             Texture2D acidRain = ModContent.GetInstance<NDMod>().GetTexture("Assets/Textures/AcidRain");
             if (Main.rainTexture == rainTex)
                 Main.rainTexture = acidRain;
@@ -69,29 +69,33 @@ namespace NDMod.Content.Disasters
             }
         }
         public override string Name => "Acid Rain";
-        public override bool CanActivate => Main.raining && ModContent.GetInstance<DisasterConfig>().disasterEnabled_AcidRain;
+        public override bool CanActivate => Main.raining && ModContent.GetInstance<DisasterConfig>().disasterEnabled_AcidRain && !ModContent.GetInstance<Hailstorm>().Active;
         public override int Cooldown => 64000;
-        public override int MinDuration => 3000;
+        public override int MinDuration => 8000;
         public override void UpdateAlways()
         {
             if (!Main.raining)
-                ForcefullyStopDisaster();
+                End();
         }
         public static Texture2D rainTex;
         public override void Initialize()
         {
             Mod mod = ModContent.GetInstance<NDMod>();
-            rainTex = Main.rainTexture;
+            if (!Main.dedServ)
+            {
+                rainTex = Main.rainTexture;
 
-            SFXSizzle = mod.GetSound("Assets/SoundEffects/Sizzle");
-            SFXISizzle = SFXSizzle.CreateInstance();
-            SFXISizzle.IsLooped = true;
-            SFXISizzle.Play();
-            SFXISizzle.Volume = 0f;
+                SFXSizzle = mod.GetSound("Assets/SoundEffects/Sizzle");
+                SFXISizzle = SFXSizzle.CreateInstance();
+                SFXISizzle.IsLooped = true;
+                SFXISizzle.Play();
+                SFXISizzle.Volume = 0f;
+            }
         }
         public override void SaveAndQuit()
         {
             Main.rainTexture = rainTex;
+            SFXISizzle.Volume = 0f;
         }
         public override bool ShouldTownNPCsGoToHomes => true;
     }
