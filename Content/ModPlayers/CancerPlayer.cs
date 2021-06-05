@@ -26,20 +26,6 @@ namespace NDMod.Content.ModPlayers
                 player.AddBuff(ModContent.BuffType<Cancer>(), 2, false);
             if (solarFlareExposure >= twentyTwoPointThree)
                 hasCancer = true;
-            // Main.NewText($"{solarFlareExposure / 60} -> {twentyTwoPointThree / 60}");
-
-            var pt = (Main.MouseWorld / 16).ToPoint();
-
-            var tList = WorldGenUtils.GetTileSquareCoordinates(pt.X, pt.Y, 20, 20);
-
-            if (Main.keyState.OnKeyPressed(Keys.L))
-            {
-                Main.NewText(TileID.Search.GetName(Main.MouseWorld.ToTile().type));
-                foreach (Point p in tList)
-                {
-                    // WorldGen.TileFrame(p.X, p.Y);
-                }
-            }
         }
         public override void Kill(double damage, int hitDirection, bool pvp, PlayerDeathReason damageSource)
         {

@@ -25,7 +25,7 @@ namespace NDMod.Content.ModPlayers
             var ingameUIPath = "Assets/Textures/UI/IngameUI";
             var scrollBody = mod.GetTexture($"{ingameUIPath}/ScrollBody");
             (int, int) bounds = CommonUtils.GetScreenCenter();
-            Rectangle scrollBounds = new Rectangle(bounds.Item1 - scrollBody.Width / 2, bounds.Item2 - scrollBody.Height / 2, scrollBody.Width, scrollBody.Height);
+            Rectangle scrollBounds = new Rectangle(bounds.Item1 - scrollBody.Width / 2, bounds.Item2 - scrollBody.Height / 2, scrollBody.Width, scrollBody.Height + 50);
             return ViewingDisastersScroll && scrollBounds.Contains(Main.MouseScreen.ToPoint()) ? false : true;
         }
         public override void ModifyScreenPosition()

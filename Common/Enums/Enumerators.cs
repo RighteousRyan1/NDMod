@@ -8,7 +8,7 @@ namespace NDMod.Common.Enums
         ColdFront,
         Flood,
         Tornado,
-        Hurricane,
+        Hurricane,  
         SolarFlare,
         Thunderstorm,
         Vortex,

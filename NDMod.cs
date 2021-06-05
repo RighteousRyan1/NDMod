@@ -210,25 +210,24 @@ namespace NDMod
         private void Main_DrawInterface_30_Hotbar(On.Terraria.Main.orig_DrawInterface_30_Hotbar orig, Main self)
         {
             orig(self);
-            Main.spriteBatch.DrawString(Main.fontMouseText, $"{Lighting.GetSubLight(Main.LocalPlayer.Center)}\n{Main.LocalPlayer.GetModPlayer<DisasterPlayer>().nearChests}", new Vector2(CommonUtils.GetScreenCenter().Item1, CommonUtils.GetScreenCenter().Item2) + new Vector2(0, -40), Color.White, 0f, Main.fontMouseText.MeasureString($"{Lighting.GetSubLight(Main.LocalPlayer.Center)}") / 2, 0.5f, SpriteEffects.None, 0f);
             if (Main.mouseRight && Main.mouseRightRelease)
                 Projectile.NewProjectileDirect(Main.MouseWorld, Vector2.Zero, ModContent.ProjectileType<Content.Projectiles.Hail>(), 30, 2);
             List<ModDisaster> disasters = new List<ModDisaster>();
             foreach (ModDisaster d in ModDisasters)
                 disasters.Add(d);
-            if (Main.keyState.OnKeyPressed(Keys.Up) && mode < disasters.Count - 1)
+            if (Main.keyState.KeyJustPressed(Keys.Up) && mode < disasters.Count - 1)
             {
                 Main.PlaySound(SoundID.MenuTick);
                 mode++;
             }
-            if (Main.keyState.OnKeyPressed(Keys.Down) && mode > 0)
+            if (Main.keyState.KeyJustPressed(Keys.Down) && mode > 0)
             {
                 Main.PlaySound(SoundID.MenuTick);
                 mode--;
             }
-            if (Main.keyState.OnKeyPressed(Keys.End))
+            if (Main.keyState.KeyJustPressed(Keys.End))
                 disasters[mode].End();
-            if (Main.keyState.OnKeyPressed(Keys.Home))
+            if (Main.keyState.KeyJustPressed(Keys.Home))
                 disasters[mode].TryBegin();
 
             Main.spriteBatch.DrawString(Main.fontMouseText, $"{disasters[mode].GetType().Name}", new Vector2(8, Main.screenHeight - 40), Color.White);
@@ -242,6 +241,11 @@ namespace NDMod
 
         public override void PostUpdateEverything()
         {
+            if (Main.keyState.KeyJustPressed(Keys.P))
+            {
+                // Main.NewText("Getting liquid pool...");
+                // WorldUtils.GetLiquidPool((Main.MouseWorld / 16).ToPoint(), new Point(20, 20), true);
+            }
             _dataWaveSolar?.UseIntensity(CancerPlayer.shadersIntensity);
             _dataOrangeVignette?.UseIntensity(CancerPlayer.shadersIntensity);
             foreach (ModDisaster disaster in ModDisasters)
@@ -255,7 +259,7 @@ namespace NDMod
             }
         }
 
-        private static float[] buttonScales = new float[30];
+        private static readonly float[] buttonScales = new float[30];
         internal static ScrollUIMode ScrollUI;
         private static void DrawScrollUI(bool beginAndEnd = false)
         {

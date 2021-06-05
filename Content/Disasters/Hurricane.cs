@@ -41,8 +41,7 @@ namespace NDMod.Content.Disasters
         public override void UpdateActive(ModDisaster disaster)
         {
             Main.maxRaining = 1f;
-            Main.numClouds = 30;
-            // Main.NewText($"{Main.windSpeed} : {_windSpeedApproachable}");
+            Main.numClouds = 60;
             for (int i = 0; i < Main.ActivePlayersCount; i++)
             {
                 var player = Main.player[i];

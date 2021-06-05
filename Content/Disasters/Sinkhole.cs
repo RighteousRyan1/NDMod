@@ -26,7 +26,7 @@ namespace NDMod.Content.Disasters
                 mod.Logger.Debug("Failed to place sinkhole. No suitable place found.");
                 return;
             }
-            WorldGenUtils.TryGenerateSinkholeNatural(out bool sunk);
+            WorldUtils.TryGenerateSinkholeNatural(out bool sunk);
 
             if (sunk)
             {

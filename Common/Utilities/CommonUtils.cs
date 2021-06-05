@@ -21,11 +21,11 @@ namespace NDMod.Common.Utilities
             public const float VeryRare = 0.001f;
             public const float UltraRare = 0.00075f;
         }
-        public static bool OnKeyPressed(this KeyboardState state, Keys key)
+        public static bool KeyJustPressed(this KeyboardState state, Keys key)
         {
             return state.IsKeyDown(key) && !Main.oldKeyState.IsKeyDown(key);
         }
-        public static bool OnKeyRelease(this KeyboardState state, Keys key)
+        public static bool KeyJustReleased(this KeyboardState state, Keys key)
         {
             return !state.IsKeyDown(key) && Main.oldKeyState.IsKeyDown(key);
         }

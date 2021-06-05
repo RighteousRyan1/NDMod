@@ -9,7 +9,7 @@ using NDMod.Content.ModPlayers;
 
 namespace NDMod.Common.Utilities
 {
-    public class WorldGenUtils
+    public class WorldUtils
     {
         public static List<Tile> GetTileSquare(int i, int j, int width, int height)
         {
@@ -47,7 +47,7 @@ namespace NDMod.Common.Utilities
             var pCenterTCoords = player.Center.ToTileCoordinates();
             var sizeVariation = Main.rand.Next(-25, 75);
 
-            ReBegin:
+        ReBegin:
             (Vector2, bool) GetGoodCoordinates(out Tile foundTile)
             {
                 foundTile = Main.tile[1, 1];
@@ -207,6 +207,145 @@ namespace NDMod.Common.Utilities
                     }
                 }
             }
+        }
+        /// <summary>
+        /// Gets the tile: up, down, left, and right as tiles respectively from the tile located at the Point provided. <para>Think of it as </para>
+        /// <code>Tile[] { up, down, left, right };</code>
+        /// </summary>
+        /// <param name="tileCoords"></param>
+        /// <returns>The tile up, down, left, and right of the Point.</returns>
+        public static Tile[] GetTilesInCardinalsFrom(Point tileCoords)
+        {
+            Tile tLeft = Framing.GetTileSafely(tileCoords.X - 1, tileCoords.Y);
+            Tile tRight = Framing.GetTileSafely(tileCoords.X + 1, tileCoords.Y); ;
+            Tile tUp = Framing.GetTileSafely(tileCoords.X, tileCoords.Y - 1); ;
+            Tile tDown = Framing.GetTileSafely(tileCoords.X, tileCoords.Y + 1); ;
+
+            return new Tile[]
+            {
+                tUp,
+                tDown,
+                tLeft,
+                tRight
+            };
+        }
+        public static Point[] GetTileCoordinatesInCardinalsFrom(Point tileCoords)
+        {
+
+            var up = new Point(tileCoords.X, tileCoords.Y - 1);
+            var down = new Point(tileCoords.X, tileCoords.Y + 1);
+            var left = new Point(tileCoords.X - 1, tileCoords.Y);
+            var right = new Point(tileCoords.X + 1, tileCoords.Y);
+            return new Point[]
+            {
+                up,
+                down,
+                left,
+                right
+            };
+        }
+        /// <summary>
+        /// Doesn't even work.
+        /// </summary>
+        public static void GetLiquidPool(Point initialTileCoordinates, Point area, bool showTiles = false)
+        {
+            Tile initialTile = Framing.GetTileSafely(initialTileCoordinates);
+
+            Tile[] sorroundTile2 = GetTilesInCardinalsFrom(initialTileCoordinates);
+
+            Main.NewText($"{initialTile.liquid} : {sorroundTile2[0].liquid}");
+
+            var mathX = initialTileCoordinates.X - (area.X / 2);
+            var mathY = initialTileCoordinates.Y - (area.Y / 2);
+            for (int x = mathX; x < mathX + area.X; x++)
+            {
+                for (int y = mathY; y < mathY + area.Y; y++)
+                {
+                    // up, down, left, right
+                    Tile[] sorroundTile = GetTilesInCardinalsFrom(new Point(x, y));
+
+                    Tile[] tileAroundSorroundTile = { };
+
+                    Point[] sorroundCoords = GetTileCoordinatesInCardinalsFrom(new Point(x, y));
+
+                    foreach (var pt in sorroundCoords)
+                    {
+                        tileAroundSorroundTile = GetTilesInCardinalsFrom(pt);
+                    }
+
+                    if (tileAroundSorroundTile[0].liquid > 0 && sorroundTile[0].liquid > 0)
+                    {
+                        Dust.QuickBox(new Vector2(x, y).ToWorldCoordinates() - new Vector2(8, 8),
+                            new Vector2(x, y).ToWorldCoordinates() + new Vector2(8, 8),
+                            5, Color.Green, null);
+                    }
+                    else
+                    {
+                        Dust.QuickBox(new Vector2(x, y).ToWorldCoordinates() - new Vector2(8, 8),
+                            new Vector2(x, y).ToWorldCoordinates() + new Vector2(8, 8),
+                            5, Color.Red, null);
+                    }
+                    if (tileAroundSorroundTile[1].liquid > 0 && sorroundTile[1].liquid > 0)
+                    {
+                        Dust.QuickBox(new Vector2(x, y).ToWorldCoordinates() - new Vector2(8, 8),
+                            new Vector2(x, y).ToWorldCoordinates() + new Vector2(8, 8),
+                            5, Color.Green, null);
+                    }
+                    else
+                    {
+                        Dust.QuickBox(new Vector2(x, y).ToWorldCoordinates() - new Vector2(8, 8),
+                            new Vector2(x, y).ToWorldCoordinates() + new Vector2(8, 8),
+                            5, Color.Red, null);
+                    }
+                    if (tileAroundSorroundTile[2].liquid > 0 && sorroundTile[2].liquid > 0)
+                    {
+                        Dust.QuickBox(new Vector2(x, y).ToWorldCoordinates() - new Vector2(8, 8),
+                            new Vector2(x, y).ToWorldCoordinates() + new Vector2(8, 8),
+                            5, Color.Green, null);
+                    }
+                    else
+                    {
+                        Dust.QuickBox(new Vector2(x, y).ToWorldCoordinates() - new Vector2(8, 8),
+                            new Vector2(x, y).ToWorldCoordinates() + new Vector2(8, 8),
+                            5, Color.Red, null);
+                    }
+                    if (tileAroundSorroundTile[3].liquid > 0 && sorroundTile[3].liquid > 0)
+                    {
+                        Dust.QuickBox(new Vector2(x, y).ToWorldCoordinates() - new Vector2(8, 8),
+                            new Vector2(x, y).ToWorldCoordinates() + new Vector2(8, 8),
+                            5, Color.Green, null);
+                    }
+                    else
+                    {
+                        Dust.QuickBox(new Vector2(x, y).ToWorldCoordinates() - new Vector2(8, 8),
+                            new Vector2(x, y).ToWorldCoordinates() + new Vector2(8, 8),
+                            5, Color.Red, null);
+                    }
+                }
+            }
+        }
+        /// <summary>
+        /// Use 'as x' syntax. (also doesn't work)
+        /// </summary>
+        /// <param name="tileCoordinates"></param>
+        /// <param name="area"></param>
+        /// <returns></returns>
+        public static object ChooseRandomTileFrom(Point tileCoordinates, Point area)
+        {
+            var mathX = tileCoordinates.X - (area.X / 2);
+            var mathY = tileCoordinates.Y - (area.Y / 2);
+            restart:
+            for (int x = mathX; x < mathX + area.X; x++)
+            {
+                for (int y = mathY; y < mathY + area.Y; y++)
+                {
+                    if (Main.rand.Next(20) == 0)
+                        return Main.tile[x, y];
+                    else
+                        goto restart;
+                }
+            }
+            return "Invalid";
         }
     }
 }
