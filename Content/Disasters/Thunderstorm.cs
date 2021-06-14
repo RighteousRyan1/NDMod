@@ -17,7 +17,7 @@ namespace NDMod.Content.Disasters
 {
     public class Thunderstorm : ModDisaster
     {
-        public override int MaxDuration => 7500;
+        public override int MaxDuration => 10500;
         public override float ChanceToOccur => 0.00001f;
         public override bool OnEnd()
         {
@@ -27,7 +27,7 @@ namespace NDMod.Content.Disasters
         {
             return base.OnBegin();
         }
-        public override void UpdateActive(ModDisaster disaster)
+        public override void UpdateActive()
         {
             Player player = Main.player[Main.myPlayer];
             Projectile p = default;
@@ -56,6 +56,6 @@ namespace NDMod.Content.Disasters
         public override string Name => "Thunderstorm";
         public override bool CanActivate => Main.raining && Main.maxRaining > 0.3f;
         public override int Cooldown => 6000;
-        public override int MinDuration => 4250;
+        public override int MinDuration => 9250;
     }
 }

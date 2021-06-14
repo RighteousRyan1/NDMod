@@ -5,6 +5,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna;
 using System.Collections.Generic;
 using System.Reflection;
+using Microsoft.Xna.Framework.Graphics;
 
 namespace NDMod.Common.Utilities
 {
@@ -51,6 +52,36 @@ namespace NDMod.Common.Utilities
 				value.B += step;
 
 			return value;
+		}
+		public static Color GetAverageColor(this Texture2D texture)
+		{
+			Color[] colorBuffer = texture.GetColors();
+			int avgR = 0;
+			int avgG = 0;
+			int avgB = 0;
+			int cLen = colorBuffer.Length;
+
+			for (int i = 0; i < colorBuffer.Length; i++)
+			{
+				var c = colorBuffer[i];
+				if (c.A != 255)
+				{
+					cLen--;
+					continue;
+				}
+
+				avgR += c.R;
+				avgG += c.G;
+				avgB += c.B;
+			}
+
+			return new Color((byte)(avgR / cLen), (byte)(avgG / cLen), (byte)(avgB / cLen));
+		}
+		public static Color[] GetColors(this Texture2D tex)
+		{
+			Color[] colorBuffer = new Color[tex.Width * tex.Height];
+			tex.GetData(colorBuffer);
+			return colorBuffer;
 		}
 	}
 }

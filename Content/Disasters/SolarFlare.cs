@@ -16,7 +16,7 @@ namespace NDMod.Content.Disasters
     public class SolarFlare : ModDisaster
     {
         public override bool ShouldTownNPCsGoToHomes => true;
-        public override int MaxDuration => 12000;
+        public override int MaxDuration => 17250;
         public override float ChanceToOccur => 0.000025f;
         public override bool OnEnd()
         {
@@ -26,7 +26,7 @@ namespace NDMod.Content.Disasters
         {
             return base.OnBegin();
         }
-        public override void UpdateActive(ModDisaster disaster)
+        public override void UpdateActive()
         {
             var player = Main.player[Main.myPlayer].GetModPlayer<CancerPlayer>().player;
             var cancerPlayer = Main.player[Main.myPlayer].GetModPlayer<CancerPlayer>();
@@ -72,7 +72,7 @@ namespace NDMod.Content.Disasters
             }
             cancerPlayer.solarFlareExposure += CancerPlayer.shadersIntensity;
         }
-        public override void UpdateInactive(ModDisaster disaster)
+        public override void UpdateInactive()
         {
             var player = Main.player[Main.myPlayer].GetModPlayer<CancerPlayer>().player;
             var cancerPlayer = Main.player[Main.myPlayer].GetModPlayer<CancerPlayer>();
@@ -87,6 +87,6 @@ namespace NDMod.Content.Disasters
         public override string Name => "Solar Flare";
         public override bool CanActivate => true;
         public override int Cooldown => 15000;
-        public override int MinDuration => 10000;
+        public override int MinDuration => 12500;
     }
 }

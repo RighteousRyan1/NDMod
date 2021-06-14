@@ -28,7 +28,7 @@ namespace NDMod.Content.Disasters
         {
             return base.OnBegin();
         }
-        public override void UpdateActive(ModDisaster disaster)
+        public override void UpdateActive()
         {
             // def = 0.16f
             Main.maxRaining = 0.6f;
@@ -58,7 +58,7 @@ namespace NDMod.Content.Disasters
                 }
             }
 		}
-        public override void UpdateInactive(ModDisaster disaster)
+        public override void UpdateInactive()
         {
             Texture2D acidRain = ModContent.GetInstance<NDMod>().GetTexture("Assets/Textures/AcidRain");
             if (Main.rainTexture == acidRain)
@@ -67,13 +67,11 @@ namespace NDMod.Content.Disasters
             }
         }
         public override string Name => "Acid Rain";
-        public override bool CanActivate => Main.raining && ModContent.GetInstance<DisasterConfig>().disasterEnabled_AcidRain && !ModContent.GetInstance<Hailstorm>().Active;
-        public override int Cooldown => 64000;
+        public override bool CanActivate => Main.raining && ModContent.GetInstance<DisasterConfig>().disasterEnabled_AcidRain && !ModContent.GetInstance<Hailstorm>().Active && base.CanActivate;
+        public override int Cooldown => 32000;
         public override int MinDuration => 8000;
         public override void UpdateAlways()
         {
-            if (!Main.raining)
-                End();
         }
         public static Texture2D rainTex;
         public override void Initialize()

@@ -36,7 +36,7 @@ namespace NDMod.Content.Items
                 bool isSinkhole = disaster.Name.Equals("Sinkhole");
                 tooltips.Add(new TooltipLine(mod, "AllDisasters", $"{disaster.Name}: " + (!isSinkhole ? (disaster.Active ? "Active" : "Inactive") : $"Last occurred {Disasters.Sinkhole.timeType}"))
                 {
-                    overrideColor = Color.BlanchedAlmond
+                    overrideColor = disaster.Active ? Color.LimeGreen : Main.errorColor
                 });
             }
         }

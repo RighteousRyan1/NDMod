@@ -42,7 +42,6 @@ namespace NDMod.Common.Utilities
         internal static bool TryGenerateSinkholeNatural(out bool result)
         {
             var player = Main.player[Main.myPlayer].GetModPlayer<DisasterPlayer>().player;
-            var mplayer = player.GetModPlayer<DisasterPlayer>();
 
             var pCenterTCoords = player.Center.ToTileCoordinates();
             var sizeVariation = Main.rand.Next(-25, 75);
@@ -161,7 +160,6 @@ namespace NDMod.Common.Utilities
                         }
                     }
                 }
-                Main.NewText("The ground has caved in!", Color.LightBlue);
             }
             return foundCoords.Item2;
         }

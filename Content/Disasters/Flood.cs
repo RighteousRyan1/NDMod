@@ -13,7 +13,8 @@ namespace NDMod.Content.Disasters
 {
     public class Flood : ModDisaster
     {
-        public override int MaxDuration => 9000;
+        public override int MaxDuration => 7000;
+		public override int MinDuration => 5500;
         public override float ChanceToOccur => 0.0001f;
         public override bool OnEnd()
         {
@@ -25,7 +26,7 @@ namespace NDMod.Content.Disasters
         }
         private bool wasActive;
         private bool isActive;
-        public override void UpdateActive(ModDisaster disaster)
+        public override void UpdateActive()
         {
             if (!ModContent.GetInstance<AcidRain>().Active)
             {
@@ -74,6 +75,6 @@ namespace NDMod.Content.Disasters
         }
         public override string Name => "Flooding";
         public override bool CanActivate => Main.raining;
-        public override int Cooldown => 3000;
+        public override int Cooldown => 7000;
     }
 }

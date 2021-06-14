@@ -19,7 +19,7 @@ namespace NDMod.Content.Disasters
         internal static string timeType;
         public override int MaxDuration => 2;
         public override float ChanceToOccur => 0.0005f;
-        public override void UpdateActive(ModDisaster disaster)
+        public override void UpdateActive()
         {
             if (Main.player[Main.myPlayer].GetModPlayer<DisasterPlayer>().nearChests)
             {

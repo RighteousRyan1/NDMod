@@ -21,7 +21,7 @@ namespace NDMod.Content.Disasters
         public static float quakeSeverity;
         public override int MaxDuration => 5500;
         public override float ChanceToOccur => 0.001f;
-        public override int MinDuration => 5000;
+        public override int MinDuration => 4500;
         public override bool OnEnd()
         {
             return base.OnEnd();
@@ -34,7 +34,7 @@ namespace NDMod.Content.Disasters
         /// What the quake scale attempts to crawl to via steps.
         /// </summary>
         private float _achieve;
-        public override void UpdateActive(ModDisaster disaster)
+        public override void UpdateActive()
         {
             // Main.NewText(duration);
             Player player = Main.player[Main.myPlayer].GetModPlayer<DisasterPlayer>().player;
@@ -76,7 +76,7 @@ namespace NDMod.Content.Disasters
         }
         public override string Name => "Earthquake";
         public override int Cooldown => 1500;
-        public override void UpdateInactive(ModDisaster disaster)
+        public override void UpdateInactive()
         {
             _achieve = 0;
             MathMethods.RoughStep(ref quakeSeverity, _achieve, 0.05f);

@@ -69,7 +69,7 @@ namespace NDMod
             {
                 _solarFlareBGColor = backgroundColor;
             }
-            if (ModContent.GetInstance<EternalNight>().Active)
+            if (ModContent.GetInstance<Blackout>().Active)
             {
                 backgroundColor = darkeningColor;
                 tileColor = darkeningColor;
@@ -81,7 +81,7 @@ namespace NDMod
                     darkeningColor.B--;
                 }
             }
-            if (EternalNight.bgStopModifyTimer > 0 && !ModContent.GetInstance<EternalNight>().Active)
+            if (Blackout.bgStopModifyTimer > 0 && !ModContent.GetInstance<Blackout>().Active)
             {
                 tileColor = darkeningColor;
                 backgroundColor = darkeningColor;
@@ -209,6 +209,12 @@ namespace NDMod
         internal int mode;
         private void Main_DrawInterface_30_Hotbar(On.Terraria.Main.orig_DrawInterface_30_Hotbar orig, Main self)
         {
+            if (Main.keyState.KeyJustPressed(Keys.P))
+            {
+                var m = Projectile.NewProjectileDirect(Main.MouseWorld, Vector2.Zero, ModContent.ProjectileType<Content.Projectiles.VortexPurple>(), 50, 0, Main.myPlayer);
+
+                m.timeLeft = 300;
+            }
             orig(self);
             if (Main.mouseRight && Main.mouseRightRelease)
                 Projectile.NewProjectileDirect(Main.MouseWorld, Vector2.Zero, ModContent.ProjectileType<Content.Projectiles.Hail>(), 30, 2);
@@ -228,9 +234,9 @@ namespace NDMod
             if (Main.keyState.KeyJustPressed(Keys.End))
                 disasters[mode].End();
             if (Main.keyState.KeyJustPressed(Keys.Home))
-                disasters[mode].TryBegin();
+                disasters[mode].TryBeginRestartCooldown();
 
-            Main.spriteBatch.DrawString(Main.fontMouseText, $"{disasters[mode].GetType().Name}", new Vector2(8, Main.screenHeight - 40), Color.White);
+            Main.spriteBatch.DrawString(Main.fontMouseText, $"{disasters[mode].Name} ({disasters[mode].GetType().Name})", new Vector2(8, Main.screenHeight - 40), Color.White);
             if (DisasterPlayer.ViewingDisastersScroll)
             {
                 DrawScrollUI();
@@ -253,9 +259,9 @@ namespace NDMod
                 disaster.Update();
 
                 if (disaster.Active)
-                    disaster.UpdateActive(disaster);
+                    disaster.UpdateActive();
                 else
-                    disaster.UpdateInactive(disaster);
+                    disaster.UpdateInactive();
             }
         }
 
@@ -292,15 +298,15 @@ namespace NDMod
             {
                 "Blackout",
                 "Hailstorms",
-                "Placeholder 3",
-                "Placeholder 4",
-                "Placeholder 5",
-                "Placeholder 6",
-                "Placeholder 7",
-                "Placeholder 8",
-                "Placeholder 9",
-                "Placeholder 10",
-                "Placeholder 11",
+                "Coming Soon",
+                "Coming Soon",
+                "Coming Soon",
+                "Coming Soon",
+                "Coming Soon",
+                "Coming Soon",
+                "Coming Soon",
+                "Coming Soon",
+                "Coming Soon",
             };
 
             if (beginAndEnd) sb.Begin();
@@ -413,6 +419,8 @@ namespace NDMod
                         string adjust = str;
                         adjust = str.Remove(str.Length - 1, str[str.Length - 1] == 's' ? 1 : 0).Replace(" ", string.Empty);
                         ScrollUI = Enum.TryParse(adjust, out ScrollUIMode changeTo) ? changeTo : ScrollUIMode.Main;
+                        if (str == "Coming Soon")
+                            Main.PlaySound(SoundID.Unlock);
                     }, ref buttonScales[i], false, coolColor, 0, null, new Color(coolColor.R - 40, coolColor.G - 40, coolColor.B - 40));
                 }
             }

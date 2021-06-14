@@ -17,7 +17,7 @@ namespace NDMod.Content.Disasters
 {
     public class Hurricane : ModDisaster
     {
-        public override int MaxDuration => 7500;
+        public override int MaxDuration => 15500;
         public override float ChanceToOccur => 0.00001f;
 
         private static float _windSpeedApproachable;
@@ -38,7 +38,7 @@ namespace NDMod.Content.Disasters
                 _windSpeedApproachable = 2f;
             return base.OnBegin();
         }
-        public override void UpdateActive(ModDisaster disaster)
+        public override void UpdateActive()
         {
             Main.maxRaining = 1f;
             Main.numClouds = 60;
@@ -51,7 +51,7 @@ namespace NDMod.Content.Disasters
 
             MathMethods.RoughStep(ref Main.windSpeed, _windSpeedApproachable, 0.0025f);
         }
-        public override void UpdateInactive(ModDisaster disaster)
+        public override void UpdateInactive()
         {
             if (_timerWindSpeedChange > 0)
             {
@@ -62,6 +62,6 @@ namespace NDMod.Content.Disasters
         public override string Name => "Hurricane";
         public override bool CanActivate => Main.raining;
         public override int Cooldown => 6000;
-        public override int MinDuration => 4250;
+        public override int MinDuration => 11250;
     }
 }

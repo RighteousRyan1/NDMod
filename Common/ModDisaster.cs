@@ -12,6 +12,8 @@ namespace NDMod.Common
     /// Make your own natural disaster!
     /// <para></para>
     /// You can change how it behaves, how long it stays active, whatever!
+    /// <para></para> 
+    /// All ModDisasters save their duration/time on world exit and world re-entry.
     /// <para></para>
     /// You can access any disaster using <code>ModContent.GetInstance</code>
     /// </summary>
@@ -44,7 +46,7 @@ namespace NDMod.Common
         /// Choose what to do while your disaster is active!
         /// </summary>
         /// <param name="disaster">This disaster.</param>
-        public virtual void UpdateActive(ModDisaster disaster) { }
+        public virtual void UpdateActive() { }
         /// <summary>
         /// Choose what should happen when the disaster begins.
         /// </summary>
@@ -64,7 +66,7 @@ namespace NDMod.Common
         /// <para></para>Do things like changing the chance of the disaster happening, or something else cool!
         /// </summary>
         /// <param name="disaster">This disaster.</param>
-        public virtual void UpdateInactive(ModDisaster disaster) { }
+        public virtual void UpdateInactive() { }
         /// <summary>
         /// Change the chance for this event to occur every in-game tick. <para></para>Closer to 0 means less common, closer to 1 means more common.
         /// </summary>
@@ -81,6 +83,9 @@ namespace NDMod.Common
 
         /// <summary>
         /// Determines whether or not this disaster can happen. <para></para>Set this to something like rain, a biome boolean, or anything of the sort to match your liking.
+        /// <para>
+        /// ALWAYS return base.CanActivate otherwise your mod will have issues.
+        /// </para>
         /// </summary>
         public virtual bool CanActivate => cdTimer <= 0;
 
@@ -105,6 +110,7 @@ namespace NDMod.Common
         // Should this be kept?
         // public virtual int RandomUpdateTime => 1;
 
+
         /// <summary>
         /// Tries to begin the disaster. If it cannot begin, an error message will be printed into chat.
         /// </summary>
@@ -113,6 +119,19 @@ namespace NDMod.Common
             if (!CanActivate)
             {
                 Main.NewTextMultiline($"Failed to start the {GetType().Name} ({Name}) disaster. It cannot be activated." 
+                    + $"\nDid you mean to set CanActivate differently?", true, Color.Red);
+                return false;
+            }
+            int rand = Main.rand.Next(MinDuration, MaxDuration + 1);
+            duration = rand;
+            return true;
+        }
+        public bool TryBeginRestartCooldown()
+        {
+            cdTimer = 0;
+            if (!CanActivate)
+            {
+                Main.NewTextMultiline($"Failed to start the {GetType().Name} ({Name}) disaster. It cannot be activated."
                     + $"\nDid you mean to set CanActivate differently?", true, Color.Red);
                 return false;
             }
@@ -153,9 +172,8 @@ namespace NDMod.Common
 
             if (cdTimer > 0)
                 cdTimer--;
-
             // Every 150 ticks, attempt at starting any valid disaster.
-            if (Main.GameUpdateCount % 150 /*RandomUpdateTime*/ == 0)
+            if (Main.GameUpdateCount % 150 == 0)
             {
                 if (Main.rand.NextFloat() <= ChanceToOccur && !Active && CanActivate)
                 {

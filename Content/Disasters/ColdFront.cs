@@ -17,8 +17,8 @@ namespace NDMod.Content.Disasters
 {
     public class ColdFront : ModDisaster
     {
-        public override int MaxDuration => 40000;
-        public override float ChanceToOccur => 0.025f;
+        public override int MaxDuration => 29000;
+        public override float ChanceToOccur => 0.005f;
         public override bool OnEnd()
         {
             return base.OnEnd();
@@ -27,7 +27,7 @@ namespace NDMod.Content.Disasters
         {
             return base.OnBegin();
         }
-        public override void UpdateActive(ModDisaster disaster)
+        public override void UpdateActive()
         {
             var p = Main.player[Main.myPlayer];
             var pl = p.GetModPlayer<ModPlayers.DisasterPlayer>();

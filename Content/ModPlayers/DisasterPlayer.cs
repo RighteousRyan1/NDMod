@@ -18,6 +18,7 @@ namespace NDMod.Content.ModPlayers
         public static bool ViewingDisastersScroll { get; set; }
         public bool shouldLoseLife;
         public bool nearChests;
+        public bool isBeingSucked;
 
         public int joiningWorldTimer;
         public override bool PreItemCheck()
@@ -27,6 +28,21 @@ namespace NDMod.Content.ModPlayers
             (int, int) bounds = CommonUtils.GetScreenCenter();
             Rectangle scrollBounds = new Rectangle(bounds.Item1 - scrollBody.Width / 2, bounds.Item2 - scrollBody.Height / 2, scrollBody.Width, scrollBody.Height + 50);
             return ViewingDisastersScroll && scrollBounds.Contains(Main.MouseScreen.ToPoint()) ? false : true;
+        }
+
+        private bool _oldVortexAffect;
+        private bool _newVortexAffect;
+        public override void ModifyDrawInfo(ref PlayerDrawInfo drawInfo)
+        {
+            _newVortexAffect = isBeingSucked;
+            player.fullRotationOrigin = player.Hitbox.Size() / 2;
+            if (isBeingSucked)
+                player.fullRotation = player.fullRotation.AngleLerp(player.velocity.ToRotation() + MathHelper.PiOver2, 0.5f);
+
+            if (_oldVortexAffect && !_newVortexAffect)
+                player.fullRotation = 0f;
+
+            _oldVortexAffect = _newVortexAffect;
         }
         public override void ModifyScreenPosition()
         {
@@ -90,6 +106,7 @@ namespace NDMod.Content.ModPlayers
             {
                 nearChests = false;
             }
+            isBeingSucked = false;
         }
         public override void PostUpdateBuffs()
         {
@@ -122,6 +139,7 @@ namespace NDMod.Content.ModPlayers
         }
         public override void Kill(double damage, int hitDirection, bool pvp, PlayerDeathReason damageSource)
         {
+            isBeingSucked = false;
         }
         public override void DrawEffects(PlayerDrawInfo drawInfo, ref float r, ref float g, ref float b, ref float a, ref bool fullBright)
         {
