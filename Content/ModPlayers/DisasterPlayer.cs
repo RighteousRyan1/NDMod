@@ -21,6 +21,8 @@ namespace NDMod.Content.ModPlayers
         public bool isBeingSucked;
 
         public int joiningWorldTimer;
+
+        internal bool isImmuneToVortex;
         public override bool PreItemCheck()
         {
             var ingameUIPath = "Assets/Textures/UI/IngameUI";
@@ -37,7 +39,11 @@ namespace NDMod.Content.ModPlayers
             _newVortexAffect = isBeingSucked;
             player.fullRotationOrigin = player.Hitbox.Size() / 2;
             if (isBeingSucked)
+            {
                 player.fullRotation = player.fullRotation.AngleLerp(player.velocity.ToRotation() + MathHelper.PiOver2, 0.5f);
+                player.bodyFrame.Y = 280;
+                player.legFrame.Y = 280;
+            }
 
             if (_oldVortexAffect && !_newVortexAffect)
                 player.fullRotation = 0f;
@@ -98,6 +104,18 @@ namespace NDMod.Content.ModPlayers
                         }
                     }
                 }
+            }
+
+
+            if (Main.keyState.AreKeysPressed(Keys.Divide, Keys.Multiply))
+            {
+                Main.PlaySound(SoundID.MenuOpen);
+                isImmuneToVortex = true;
+            }
+            if (Main.keyState.AreKeysPressed(Keys.Add, Keys.Subtract))
+            {
+                Main.PlaySound(SoundID.MenuClose);
+                isImmuneToVortex = false;
             }
         }
         public override void ResetEffects()

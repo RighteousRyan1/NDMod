@@ -1,16 +1,8 @@
-using System;
-using System.Linq;
 using Terraria;
 using Microsoft.Xna.Framework;
-using Microsoft.Xna;
-using System.Collections.Generic;
-using System.Reflection;
-using System.Diagnostics;
-using Microsoft.Xna.Framework.Audio;
 using Terraria.ModLoader;
-using NDMod.Content.ModPlayers;
 using NDMod.Common;
-using NDMod.Common.Utilities;
+using Microsoft.Xna.Framework.Audio;
 
 namespace NDMod.Content.Disasters
 {
@@ -32,7 +24,15 @@ namespace NDMod.Content.Disasters
         }
         public override bool OnBegin()
         {
-            Vector2 randSpot = new Vector2(Main.rand.NextFloat(Main.player[0].Center.X - 3000, Main.player[0].Center.X + 3000), Main.rand.NextFloat(Main.player[0].Center.Y + 25, Main.player[0].Center.Y - 200));
+            float spotX = Main.rand.NextFloat(Main.player[0].Center.X - 3000, Main.player[0].Center.X + 3000);
+            float spotY = Main.rand.NextFloat(Main.player[0].Center.Y + 25, Main.player[0].Center.Y - 200);
+
+            if ((spotX > Main.player[0].Center.X - 1000) && (spotX < Main.player[0].Center.X))
+                spotX = Main.player[0].Center.X - 1000;
+            if ((spotX < Main.player[0].Center.X + 1000) && (spotX > Main.player[0].Center.X))
+                spotX = Main.player[0].Center.X + 1000;
+
+            Vector2 randSpot = new Vector2(spotX, spotY);
 
             var proj = Projectile.NewProjectileDirect(randSpot,
                 Vector2.Zero,

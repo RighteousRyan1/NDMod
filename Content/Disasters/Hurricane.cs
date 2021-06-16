@@ -49,14 +49,14 @@ namespace NDMod.Content.Disasters
                     player.AddBuff(BuffID.WindPushed, 2, true);
             }
 
-            MathMethods.RoughStep(ref Main.windSpeed, _windSpeedApproachable, 0.0025f);
+            MathUtils.RoughStep(ref Main.windSpeed, _windSpeedApproachable, 0.0025f);
         }
         public override void UpdateInactive()
         {
             if (_timerWindSpeedChange > 0)
             {
                 _timerWindSpeedChange--;
-                MathMethods.RoughStep(ref Main.windSpeed, _windSpeedApproachable, 0.075f);
+                MathUtils.RoughStep(ref Main.windSpeed, _windSpeedApproachable, 0.075f);
             }
         }
         public override string Name => "Hurricane";

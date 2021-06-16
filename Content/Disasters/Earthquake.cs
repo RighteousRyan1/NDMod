@@ -52,7 +52,7 @@ namespace NDMod.Content.Disasters
                     //Main.NewText("Safe, Going to " + _achieve);
                 }
             }
-            MathMethods.RoughStep(ref quakeSeverity, _achieve, 0.05f);
+            MathUtils.RoughStep(ref quakeSeverity, _achieve, 0.05f);
             // Main.NewText($"Severe: {quakeSeverity}");
             if (Math.Abs(quakeSeverity) >= 15)
             {
@@ -79,7 +79,7 @@ namespace NDMod.Content.Disasters
         public override void UpdateInactive()
         {
             _achieve = 0;
-            MathMethods.RoughStep(ref quakeSeverity, _achieve, 0.05f);
+            MathUtils.RoughStep(ref quakeSeverity, _achieve, 0.05f);
         }
         public override void UpdateAlways()
         {

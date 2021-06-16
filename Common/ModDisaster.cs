@@ -118,8 +118,7 @@ namespace NDMod.Common
         {
             if (!CanActivate)
             {
-                Main.NewTextMultiline($"Failed to start the {GetType().Name} ({Name}) disaster. It cannot be activated." 
-                    + $"\nDid you mean to set CanActivate differently?", true, Color.Red);
+                Main.NewTextMultiline($"Failed to start the '{Name}' disaster. It cannot be activated.", true, Color.Red);
                 return false;
             }
             int rand = Main.rand.Next(MinDuration, MaxDuration + 1);

@@ -49,7 +49,7 @@ namespace NDMod.Content.Disasters
             {
                 if (p.wet)
                 {
-
+                    p.Kill();
                 }
             }
         }

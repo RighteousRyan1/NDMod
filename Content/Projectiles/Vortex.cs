@@ -7,6 +7,7 @@ using Microsoft.Xna.Framework.Graphics;
 using NDMod.Common.Utilities;
 using Terraria.DataStructures;
 using NDMod.Content.ModPlayers;
+using Microsoft.Xna.Framework.Audio;
 
 namespace NDMod.Content.Projectiles
 {
@@ -27,7 +28,16 @@ namespace NDMod.Content.Projectiles
             projectile.scale = 1;
 			projectile.tileCollide = false;
 
-            ProjectileID.Sets.TrailCacheLength[projectile.type] = 5;
+            if (!Main.gameMenu)
+            {
+                ambientSound = mod.GetSound("Assets/SoundEffects/VortexAmbient");
+                ambientSoundInstance = ambientSound.CreateInstance();
+                ambientSoundInstance.IsLooped = true;
+                ambientSoundInstance.Volume = 0f;
+                ambientSoundInstance?.Play();
+            }
+
+            ProjectileID.Sets.TrailCacheLength[projectile.type] = 10;
             ProjectileID.Sets.TrailingMode[projectile.type] = 0;
         }
         public override bool PreDraw(SpriteBatch spriteBatch, Color lightColor)
@@ -45,7 +55,7 @@ namespace NDMod.Content.Projectiles
         public override void AI()
         {
             projectile.ai[0] += _ai0Increment;
-            projectile.rotation += 0.05f;
+            projectile.rotation += 0.1f;
 
             projectile.velocity.Y = (float)System.Math.Cos(projectile.ai[0]) * 5;
             projectile.velocity.X = (float)System.Math.Sin(projectile.ai[0]) * 5;
@@ -167,22 +177,25 @@ namespace NDMod.Content.Projectiles
                     }
                 }
             }
-            foreach (Player player in Main.player)
+            if (!Main.player[Main.myPlayer].GetModPlayer<DisasterPlayer>().isImmuneToVortex)
             {
-                if (player.active)
+                foreach (Player player in Main.player)
                 {
-                    float dist = projectile.Distance(player.Center);
-                    if (dist <= 1000f && !player.dead)
+                    if (player.active)
                     {
-                        player.GetModPlayer<DisasterPlayer>().isBeingSucked = true;
-                        player.velocity += (projectile.Center - player.Center) / GetStrength(dist);
-                        if (Main.GameUpdateCount % 5 == 0)
-                            player.statLife -= 4 - (int)System.Math.Round(dist) / 250;
-                        // Main.NewText(10f - (int)System.Math.Round(dist) / 100);
+                        float dist = projectile.Distance(player.Center);
+                        if (dist <= 1000f && !player.dead)
+                        {
+                            player.GetModPlayer<DisasterPlayer>().isBeingSucked = true;
+                            player.velocity += (projectile.Center - player.Center) / GetStrength(dist);
+                            if (Main.GameUpdateCount % 5 == 0)
+                                player.statLife -= 4 - (int)System.Math.Round(dist) / 250;
+                            // Main.NewText(10f - (int)System.Math.Round(dist) / 100);
+                        }
+                        if (dist > 1000f)
+                            player.GetModPlayer<DisasterPlayer>().isBeingSucked = false;
                     }
-                    if (dist > 1000f)
-                        player.GetModPlayer<DisasterPlayer>().isBeingSucked = false;
-                    if (dist < minDist)
+                    if (player.statLife < 1)
                     {
                         for (int m = 0; m < 20; m++)
                         {
@@ -190,13 +203,10 @@ namespace NDMod.Content.Projectiles
                             d.alpha += 3;
                             d.color = new Color(Main.rand.Next(0, 256), Main.rand.Next(0, 256), Main.rand.Next(0, 256));
                         }
+                        Main.PlaySound(SoundID.Item, player.Center, 20);
+                        player.KillMe(PlayerDeathReason.ByCustomReason($"{player.name} " + CommonUtils.Pick($"was brutally ripped apart by gravity.",
+                            "let the stress of gravity overcome them.", "was ripped limb by limb by the tides of gravity.")), player.statLife + 25, 0);
                     }
-                }
-                if (player.statLife < 1)
-                {
-                    Main.PlaySound(SoundID.Item, player.Center, 20);
-                    player.KillMe(PlayerDeathReason.ByCustomReason($"{player.name} " + CommonUtils.Pick($"was brutally ripped apart by gravity.",
-                        "let the stress of gravity overcome them.", "was ripped limb by limb by the tides of gravity.")), player.statLife + 25, 0);
                 }
             }
             for (int i = 0; i < 200; i++)
@@ -219,8 +229,16 @@ namespace NDMod.Content.Projectiles
                 d.alpha += 3;
                 d.color = new Color(Main.rand.Next(0, 256), Main.rand.Next(0, 256), Main.rand.Next(0, 256));
             }
+            ambientSoundInstance?.Stop();
             Main.player[Main.myPlayer].GetModPlayer<DisasterPlayer>().isBeingSucked = false;
             Main.player[Main.myPlayer].fullRotation = 0f;
+        }
+        public SoundEffect ambientSound;
+        public SoundEffectInstance ambientSoundInstance;
+        public override void PostAI()
+        {
+            ambientSoundInstance.Volume = projectile.Center.GetVolumeFromPosition() * Main.soundVolume;
+            ambientSoundInstance.Pan = projectile.Center.GetPanFromPosition();
         }
     }
     public class VortexCyan : ModProjectile
@@ -240,7 +258,15 @@ namespace NDMod.Content.Projectiles
             projectile.scale = 1;
             projectile.tileCollide = false;
 
-            ProjectileID.Sets.TrailCacheLength[projectile.type] = 5;
+            if (!Main.gameMenu)
+            {
+                ambientSound = mod.GetSound("Assets/SoundEffects/VortexAmbient");
+                ambientSoundInstance = ambientSound.CreateInstance();
+                ambientSoundInstance.IsLooped = true;
+                ambientSoundInstance.Volume = 0f;
+                ambientSoundInstance?.Play();
+            }
+            ProjectileID.Sets.TrailCacheLength[projectile.type] = 10;
             ProjectileID.Sets.TrailingMode[projectile.type] = 0;
         }
         public override bool PreDraw(SpriteBatch spriteBatch, Color lightColor)
@@ -258,7 +284,7 @@ namespace NDMod.Content.Projectiles
         public override void AI()
         {
             projectile.ai[0] += _ai0Increment;
-            projectile.rotation += 0.05f;
+            projectile.rotation += 0.1f;
 
             projectile.velocity.Y = (float)System.Math.Cos(projectile.ai[0]) * 5;
             projectile.velocity.X = (float)System.Math.Sin(projectile.ai[0]) * 5;
@@ -380,21 +406,24 @@ namespace NDMod.Content.Projectiles
                     }
                 }
             }
-            foreach (Player player in Main.player)
+            if (!Main.player[Main.myPlayer].GetModPlayer<DisasterPlayer>().isImmuneToVortex)
             {
-                if (player.active)
+                foreach (Player player in Main.player)
                 {
-                    float dist = projectile.Distance(player.Center);
-                    if (dist <= 1000f && !player.dead)
+                    if (player.active)
                     {
-                        player.GetModPlayer<DisasterPlayer>().isBeingSucked = true;
-                        player.velocity += (projectile.Center - player.Center) / GetStrength(dist);
-                        if (Main.GameUpdateCount % 5 == 0)
-                            player.statLife -= 4 - (int)System.Math.Round(dist) / 250;
+                        float dist = projectile.Distance(player.Center);
+                        if (dist <= 1000f && !player.dead)
+                        {
+                            player.GetModPlayer<DisasterPlayer>().isBeingSucked = true;
+                            player.velocity += (projectile.Center - player.Center) / GetStrength(dist);
+                            if (Main.GameUpdateCount % 5 == 0)
+                                player.statLife -= 4 - (int)System.Math.Round(dist) / 250;
+                        }
+                        if (dist > 1000f)
+                            player.GetModPlayer<DisasterPlayer>().isBeingSucked = false;
                     }
-                    if (dist > 1000f)
-                        player.GetModPlayer<DisasterPlayer>().isBeingSucked = false;
-                    if (dist < minDist)
+                    if (player.statLife < 1)
                     {
                         for (int m = 0; m < 20; m++)
                         {
@@ -402,20 +431,17 @@ namespace NDMod.Content.Projectiles
                             d.alpha += 3;
                             d.color = new Color(Main.rand.Next(0, 256), Main.rand.Next(0, 256), Main.rand.Next(0, 256));
                         }
+                        Main.PlaySound(SoundID.Item, player.Center, 20);
+                        player.KillMe(PlayerDeathReason.ByCustomReason($"{player.name} " + CommonUtils.Pick($"was brutally ripped apart by gravity.",
+                            "let the stress of gravity overcome them.", "was ripped limb by limb by the tides of gravity.")), player.statLife + 25, 0);
                     }
-                }
-                if (player.statLife < 1)
-                {
-                    Main.PlaySound(SoundID.Item, player.Center, 20);
-                    player.KillMe(PlayerDeathReason.ByCustomReason($"{player.name} " + CommonUtils.Pick($"was brutally ripped apart by gravity.",
-                        "let the stress of gravity overcome them.", "was ripped limb by limb by the tides of gravity.")), player.statLife + 25, 0);
                 }
             }
             for (int i = 0; i < 200; i++)
             {
                 if (Main.rand.Next(50) == 0)
                 {
-                    var d = Dust.NewDustDirect(projectile.position, projectile.width, projectile.height, DustID.Clentaminator_Purple, Main.rand.NextFloat(-0.25f, 0.25f), Main.rand.NextFloat(-0.25f, -0.5f));
+                    var d = Dust.NewDustDirect(projectile.position, projectile.width, projectile.height, DustID.Clentaminator_Cyan, Main.rand.NextFloat(-0.25f, 0.25f), Main.rand.NextFloat(-0.25f, -0.5f));
                     d.alpha += 3;
                     d.scale = 0.4f;
                     d.color = new Color(Main.rand.Next(0, 256), Main.rand.Next(0, 256), Main.rand.Next(0, 256));
@@ -431,8 +457,16 @@ namespace NDMod.Content.Projectiles
                 d.alpha += 3;
                 d.color = new Color(Main.rand.Next(0, 256), Main.rand.Next(0, 256), Main.rand.Next(0, 256));
             }
+            ambientSoundInstance?.Stop();
             Main.player[Main.myPlayer].GetModPlayer<DisasterPlayer>().isBeingSucked = false;
             Main.player[Main.myPlayer].fullRotation = 0f;
+        }
+        public SoundEffect ambientSound;
+        public SoundEffectInstance ambientSoundInstance;
+        public override void PostAI()
+        {
+            ambientSoundInstance.Volume = projectile.Center.GetVolumeFromPosition() * Main.soundVolume;
+            ambientSoundInstance.Pan = projectile.Center.GetPanFromPosition();
         }
     }
 }

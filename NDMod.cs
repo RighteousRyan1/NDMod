@@ -55,7 +55,8 @@ namespace NDMod
         private Color _solarFlareBGColor;
         public override void ModifyLightingBrightness(ref float scale)
         {
-            scale = 0.85f;
+            if (ModContent.GetInstance<Blackout>().Active)
+                scale = 0.85f;
         }
         public override void ModifySunLightColor(ref Color tileColor, ref Color backgroundColor)
         {
@@ -182,7 +183,6 @@ namespace NDMod
             Logger.Info("IL Patch at Terraria.NPC.AI_007_TownEntities success!");
             // now it would act like 'bool flag = Main.raining || AnyDisasterReturnsNPCHome()'
         }
-
         private static bool AnyDisasterReturnsNPCHome()
         {
             foreach (ModDisaster disaster in ModDisasters)
@@ -194,7 +194,6 @@ namespace NDMod
             }
             return false;
         }
-
         public override void PreSaveAndQuit()
         {
             Earthquake.SFXICrumble.Volume = 0f;
@@ -216,8 +215,6 @@ namespace NDMod
                 m.timeLeft = 300;
             }
             orig(self);
-            if (Main.mouseRight && Main.mouseRightRelease)
-                Projectile.NewProjectileDirect(Main.MouseWorld, Vector2.Zero, ModContent.ProjectileType<Content.Projectiles.Hail>(), 30, 2);
             List<ModDisaster> disasters = new List<ModDisaster>();
             foreach (ModDisaster d in ModDisasters)
                 disasters.Add(d);
@@ -236,7 +233,10 @@ namespace NDMod
             if (Main.keyState.KeyJustPressed(Keys.Home))
                 disasters[mode].TryBeginRestartCooldown();
 
-            Main.spriteBatch.DrawString(Main.fontMouseText, $"{disasters[mode].Name} ({disasters[mode].GetType().Name})", new Vector2(8, Main.screenHeight - 40), Color.White);
+            Main.spriteBatch.DrawString(Main.fontMouseText, $"{disasters[mode].Name} ({disasters[mode].GetType().Name})", new Vector2(8, Main.screenHeight - 50), Color.White, 0f, Vector2.Zero, 0.5f, default, 1f);
+            Main.spriteBatch.DrawString(Main.fontMouseText, "Home: Start | End: Stop", new Vector2(8, Main.screenHeight - 36), Color.White, 0f, Vector2.Zero, 0.5f, default, 1f);
+            Main.spriteBatch.DrawString(Main.fontMouseText, $"dur: {disasters[mode].duration} | cd: {disasters[mode].cdTimer}", new Vector2(8, Main.screenHeight - 64), Color.White, 0f, Vector2.Zero, 0.5f, default, 1f);
+
             if (DisasterPlayer.ViewingDisastersScroll)
             {
                 DrawScrollUI();
@@ -279,7 +279,6 @@ namespace NDMod
             Player player = Main.LocalPlayer;
 
             var sb = Main.spriteBatch;
-
             string[] disasterNamesRow1 =
             {
                 "Earthquakes",
@@ -467,7 +466,7 @@ namespace NDMod
                 "under any structure.",
                 "Be sure that your Town NPCs are somewhere safe",
                 "otherwise they will die quickly and most likely",
-                "be many casualties.",
+                "be many casualties."
             };
             string[] explainCFronts =
             {
@@ -488,7 +487,7 @@ namespace NDMod
                 "When it's flooding, you should be fine if you",
                 "have the right accessories, but NPCs may drown",
                 "if you don't have your doors shut. Be wary of your",
-                "town NPCs otherwise they may die!",
+                "town NPCs otherwise they may die!"
             };
             string[] explainSFlares =
             {
@@ -534,9 +533,21 @@ namespace NDMod
                 "when they happen in the world.",
                 "There is no real way to prevent these from",
                 "affecting the world. They will never affect",
-                "chests or any containers.",
+                "chests or any containers."
             };
-
+            string[] explainVortexes =
+            {
+                "Vortexes are a very gravitationally affecting",
+                "disaster that pulls anything besides tiles towards it.",
+                "Getting sucked into one of these mad",
+                "anomalies can lead to death by being ripped",
+                "apart or fall damage if you get flung too much!",
+                "Items, projectiles, NPCs, rain, Gores, such",
+                "are sucked in and discentegrated.",
+                "Don't drop anything!",
+                "Try to stay more than half a screen's",
+                "worth distance of away from them."
+            };
             string[] indexes =
             {
                 "Rarities: Very Common, Common, Unusual,",
@@ -595,6 +606,13 @@ namespace NDMod
                     }
                     break;
                 case ScrollUIMode.Vortex:
+                    int q = 0;
+                    warnings = "R: Very Rare | S: Severe | D: Medium";
+                    foreach (string strArr in explainVortexes)
+                    {
+                        q++;
+                        ChatManager.DrawColorCodedStringWithShadow(Main.spriteBatch, Main.fontDeathText, strArr, new Vector2(center.Item1, center.Item2 - 125 + (q - 1) * 25), Color.White, 0f, Main.fontDeathText.MeasureString(strArr) / 2, new Vector2(0.3f), -1, 1);
+                    }
                     break;
                 case ScrollUIMode.SolarFlare:
                     int s = 0;

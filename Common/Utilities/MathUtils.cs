@@ -9,7 +9,7 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace NDMod.Common.Utilities
 {
-    public static class MathMethods
+    public static class MathUtils
     {
 		public static float RoughStep(ref float value, float goal, float step)
 		{
@@ -55,27 +55,36 @@ namespace NDMod.Common.Utilities
 		}
 		public static Color GetAverageColor(this Texture2D texture)
 		{
-			Color[] colorBuffer = texture.GetColors();
-			int avgR = 0;
-			int avgG = 0;
-			int avgB = 0;
-			int cLen = colorBuffer.Length;
-
-			for (int i = 0; i < colorBuffer.Length; i++)
+			try
 			{
-				var c = colorBuffer[i];
-				if (c.A != 255)
+				Color[] colorBuffer = texture.GetColors();
+				int avgR = 0;
+				int avgG = 0;
+				int avgB = 0;
+				int cLen = colorBuffer.Length;
+
+				for (int i = 0; i < colorBuffer.Length; i++)
 				{
-					cLen--;
-					continue;
+					var c = colorBuffer[i];
+					if (c.A != 255)
+					{
+						cLen--;
+						continue;
+					}
+
+					avgR += c.R;
+					avgG += c.G;
+					avgB += c.B;
 				}
-
-				avgR += c.R;
-				avgG += c.G;
-				avgB += c.B;
+				return new Color((byte)(avgR / cLen), (byte)(avgG / cLen), (byte)(avgB / cLen));
 			}
+			catch(DivideByZeroException dbze)
+            {
+				var mod = Terraria.ModLoader.ModContent.GetInstance<NDMod>();
 
-			return new Color((byte)(avgR / cLen), (byte)(avgG / cLen), (byte)(avgB / cLen));
+				mod.Logger.Error($"{dbze.GetType().Name} thrown in NDMod.Common.Utilities.MathUtils.GetAverageColor() -> \n{dbze.Message}\n{dbze.StackTrace}");
+            }
+			return Color.White;
 		}
 		public static Color[] GetColors(this Texture2D tex)
 		{
