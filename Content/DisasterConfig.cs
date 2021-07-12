@@ -20,5 +20,37 @@ namespace NDMod.Content
 		[Label("Cold Front")]
 		[DefaultValue(true)]
 		public bool disasterEnabled_ColdFront;
+
+		[Label("Blackout")]
+		[DefaultValue(true)]
+		public bool disasterEnabled_Blackout;
+
+		[Label("Hailstorm")]
+		[DefaultValue(true)]
+		public bool disasterEnabled_Hailstorm;
+
+		[Label("Sinkhole")]
+		[DefaultValue(true)]
+		public bool disasterEnabled_Sinkhole;
+
+		[Label("Thunderstorm")]
+		[DefaultValue(true)]
+		public bool disasterEnabled_Thunderstorm;
+
+		[Label("Lava Rain")]
+		[DefaultValue(true)]
+		public bool disasterEnabled_LavaRain;
+
+		[Label("Hurricane")]
+		[DefaultValue(true)]
+		public bool disasterEnabled_Hurricane;
+
+		[Label("Solar Flare")]
+		[DefaultValue(true)]
+		public bool disasterEnabled_SolarFlare;
+
+		[Label("Vortex")]
+		[DefaultValue(true)]
+		public bool disasterEnabled_Vortex;
 	}
 }

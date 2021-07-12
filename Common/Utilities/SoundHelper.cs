@@ -18,9 +18,7 @@ namespace NDMod.Common.Utilities
 				bool onScreen = false;
 				float panFromVector = 0f;
 				if (position.X == -1 || position.Y == -1)
-				{
 					onScreen = true;
-				}
 				else
 				{
 					Rectangle screenBounds = new Rectangle((int)(Main.screenPosition.X - (Main.screenWidth * 2)), (int)(Main.screenPosition.Y - (Main.screenHeight * 2)), Main.screenWidth * 5, Main.screenHeight * 5);
@@ -37,13 +35,9 @@ namespace NDMod.Common.Utilities
 					}
 				}
 				if (panFromVector < -1f)
-				{
 					panFromVector = -1f;
-				}
 				if (panFromVector > 1f)
-				{
 					panFromVector = 1f;
-				}
 				return panFromVector;
 			}
 			catch(Exception e)
@@ -59,9 +53,7 @@ namespace NDMod.Common.Utilities
 				bool onScreen = false;
 				float volumeFromVector = 1f;
 				if (position.X == -1 || position.Y == -1)
-				{
 					onScreen = true;
-				}
 				else
 				{
 					Rectangle screenBounds = new Rectangle((int)(Main.screenPosition.X - (Main.screenWidth * 2)), (int)(Main.screenPosition.Y - (Main.screenHeight * 2)), Main.screenWidth * 5, Main.screenHeight * 5);
@@ -78,13 +70,9 @@ namespace NDMod.Common.Utilities
 					}
 				}
 				if (volumeFromVector > 1f)
-				{
 					volumeFromVector = 1f;
-				}
 				if (volumeFromVector < 0f)
-				{
 					volumeFromVector = 0f;
-				}
 				if (Vector2.Distance(Main.screenPosition, position) > 3850)
 					volumeFromVector = 0f;
 				return volumeFromVector;

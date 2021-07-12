@@ -45,6 +45,6 @@ namespace NDMod.Content.Disasters
         public override string Name => "Vortex";
         public override int Cooldown => 9500;
         public override bool ShouldTownNPCsGoToHomes => true;
-        public override bool CanActivate => ModContent.GetInstance<DisasterConfig>().disasterEnabled_Earthquakes;
+        public override bool CanActivate => ModContent.GetInstance<DisasterConfig>().disasterEnabled_Vortex;
     }
 }
