@@ -16,14 +16,6 @@ namespace NDMod.Content.Disasters
         public override int MaxDuration => 7000;
 		public override int MinDuration => 5500;
         public override float ChanceToOccur => 0.0001f;
-        public override bool OnEnd()
-        {
-            return base.OnEnd();
-        }
-        public override bool OnBegin()
-        {
-            return base.OnBegin();
-        }
         private bool wasActive;
         private bool isActive;
         public override void UpdateActive()
@@ -49,12 +41,12 @@ namespace NDMod.Content.Disasters
                         var t = Main.tile[tposx, tposy - 1];
                         var tileBelow = Framing.GetTileSafely(tposx, tposy + 1);
 
-                        isActive = (tileBelow.active() && tileBelow.collisionType == 1) || tileBelow.liquid > 0;
+                        isActive = (tileBelow.IsActive && tileBelow.CollisionType == 1) || tileBelow.LiquidAmount > 0;
 
                         if (isActive && !wasActive)
                         {
-                            t.liquidType(0);
-                            t.liquid = 255;
+                            t.LiquidType = 0;
+                            t.LiquidAmount = 255;
                             WorldGen.SquareTileFrame(tposx, tposy - 1);
                             WorldGen.DiamondTileFrame(tposx, tposy - 1);
                             if (Main.netMode == NetmodeID.MultiplayerClient)

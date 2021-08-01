@@ -41,7 +41,7 @@ namespace NDMod.Common.Utilities
         private static int _attempts;
         internal static bool TryGenerateSinkholeNatural(out bool result)
         {
-            var player = Main.player[Main.myPlayer].GetModPlayer<DisasterPlayer>().player;
+            var player = Main.player[Main.myPlayer].GetModPlayer<DisasterPlayer>().Player;
 
             var pCenterTCoords = player.Center.ToTileCoordinates();
             var sizeVariation = Main.rand.Next(-25, 75);
@@ -66,7 +66,7 @@ namespace NDMod.Common.Utilities
                         Tile tileUp = Main.tile[i, j - 1];
                         Tile tileDown = Main.tile[i, j + 1];
 
-                        bool isValidTileToAffect = tileDown.active() && !tileUp.active() && tileLeft.active() && tileRight.active() && j <= Main.worldSurface && t.collisionType == 1;
+                        bool isValidTileToAffect = tileDown.IsActive && !tileUp.IsActive && tileLeft.IsActive && tileRight.IsActive && j <= Main.worldSurface && t.CollisionType == 1;
                         foundTile = t;
                         if (isValidTileToAffect)
                         {
@@ -117,42 +117,30 @@ namespace NDMod.Common.Utilities
 
                             if (j > y && t.wall > 0)
                             {
-                                switch (found.type)
+                                t.wall = found.type switch
                                 {
-                                    case TileID.Sand:
-                                        t.wall = WallID.Sandstone;
-                                        break;
-                                    case TileID.Ebonstone | TileID.Ebonsand:
-                                        t.wall = WallID.EbonstoneUnsafe;
-                                        break;
-                                    case TileID.Ebonsand:
-                                        t.wall = WallID.EbonstoneUnsafe;
-                                        break;
-                                    case TileID.JungleGrass | TileID.Mud:
-                                        t.wall = WallID.EbonstoneUnsafe;
-                                        break;
-                                    case TileID.SnowBlock:
-                                        t.wall = WallID.SnowWallUnsafe;
-                                        break;
-                                    default:
-                                        t.wall = WallID.Stone;
-                                        break;
-                                }
+                                    TileID.Sand => WallID.Sandstone,
+                                    TileID.Ebonstone | TileID.Ebonsand => WallID.EbonstoneUnsafe,
+                                    TileID.Ebonsand => WallID.EbonstoneUnsafe,
+                                    TileID.JungleGrass | TileID.Mud => WallID.EbonstoneUnsafe,
+                                    TileID.SnowBlock => WallID.SnowWallUnsafe,
+                                    _ => WallID.Stone,
+                                };
                             }
 
-                            bool setInactiveCheck1 = !tileDown.active() && !tileUp.active() && !tileRight.active() && !tileLeft.active();
+                            bool setInactiveCheck1 = !tileDown.IsActive && !tileUp.IsActive && !tileRight.IsActive && !tileLeft.IsActive;
                             bool setInactiveCheck2 = tileDown.type != TileID.Containers && tileUp.type != TileID.Containers && tileRight.type != TileID.Containers && tileLeft.type != TileID.Containers &&
                                 tileDown.type != TileID.Containers2 && tileUp.type != TileID.Containers2 && tileRight.type != TileID.Containers2 && tileLeft.type != TileID.Containers2;
                             if (setInactiveCheck1 && setInactiveCheck2)
-                                t.active(false);
+                                t.IsActive = false;
 
-                            if (tileDown.active() && !tileUp.active() && tileLeft.active() && tileRight.active())
+                            if (tileDown.IsActive && !tileUp.IsActive && tileLeft.IsActive && tileRight.IsActive)
                             {
                                 tileDown.type = found.type;
                                 tileUp.type = found.type;
                                 tileRight.type = found.type;
                                 tileLeft.type = found.type;
-                                tileUp.liquid = 255;
+                                tileUp.LiquidAmount = 255;
                             }
                             if (Main.netMode == NetmodeID.MultiplayerClient)
                                 NetMessage.SendTileSquare(255, i, j, 75);
@@ -187,19 +175,19 @@ namespace NDMod.Common.Utilities
                         if (j > y && t.wall > 0)
                             t.wall = WallID.Stone;
 
-                        bool setInactiveCheck1 = !tileDown.active() && !tileUp.active() && !tileRight.active() && !tileLeft.active();
+                        bool setInactiveCheck1 = !tileDown.IsActive && !tileUp.IsActive && !tileRight.IsActive && !tileLeft.IsActive;
                         bool setInactiveCheck2 = tileDown.type != TileID.Containers && tileUp.type != TileID.Containers && tileRight.type != TileID.Containers && tileLeft.type != TileID.Containers &&
                             tileDown.type != TileID.Containers2 && tileUp.type != TileID.Containers2 && tileRight.type != TileID.Containers2 && tileLeft.type != TileID.Containers2;
                         if (setInactiveCheck1 && setInactiveCheck2)
-                            t.active(false);
+                            t.IsActive = false;
 
-                        if (tileDown.active() && !tileUp.active() && tileLeft.active() && tileRight.active())
+                        if (tileDown.IsActive && !tileUp.IsActive && tileLeft.IsActive && tileRight.IsActive)
                         {
                             tileDown.type = TileID.Stone;
                             tileUp.type = TileID.Stone;
                             tileRight.type = TileID.Stone;
                             tileLeft.type = TileID.Stone;
-                            tileUp.liquid = 255;
+                            tileUp.LiquidAmount = 255;
                         }
                         WorldGen.SquareTileFrame(i, j);
                     }
@@ -251,7 +239,7 @@ namespace NDMod.Common.Utilities
 
             Tile[] sorroundTile2 = GetTilesInCardinalsFrom(initialTileCoordinates);
 
-            Main.NewText($"{initialTile.liquid} : {sorroundTile2[0].liquid}");
+            Main.NewText($"{initialTile.LiquidAmount} : {sorroundTile2[0].LiquidAmount}");
 
             var mathX = initialTileCoordinates.X - (area.X / 2);
             var mathY = initialTileCoordinates.Y - (area.Y / 2);
@@ -271,7 +259,7 @@ namespace NDMod.Common.Utilities
                         tileAroundSorroundTile = GetTilesInCardinalsFrom(pt);
                     }
 
-                    if (tileAroundSorroundTile[0].liquid > 0 && sorroundTile[0].liquid > 0)
+                    if (tileAroundSorroundTile[0].LiquidAmount > 0 && sorroundTile[0].LiquidAmount > 0)
                     {
                         Dust.QuickBox(new Vector2(x, y).ToWorldCoordinates() - new Vector2(8, 8),
                             new Vector2(x, y).ToWorldCoordinates() + new Vector2(8, 8),
@@ -283,7 +271,7 @@ namespace NDMod.Common.Utilities
                             new Vector2(x, y).ToWorldCoordinates() + new Vector2(8, 8),
                             5, Color.Red, null);
                     }
-                    if (tileAroundSorroundTile[1].liquid > 0 && sorroundTile[1].liquid > 0)
+                    if (tileAroundSorroundTile[1].LiquidAmount > 0 && sorroundTile[1].LiquidAmount > 0)
                     {
                         Dust.QuickBox(new Vector2(x, y).ToWorldCoordinates() - new Vector2(8, 8),
                             new Vector2(x, y).ToWorldCoordinates() + new Vector2(8, 8),
@@ -295,7 +283,7 @@ namespace NDMod.Common.Utilities
                             new Vector2(x, y).ToWorldCoordinates() + new Vector2(8, 8),
                             5, Color.Red, null);
                     }
-                    if (tileAroundSorroundTile[2].liquid > 0 && sorroundTile[2].liquid > 0)
+                    if (tileAroundSorroundTile[2].LiquidAmount > 0 && sorroundTile[2].LiquidAmount > 0)
                     {
                         Dust.QuickBox(new Vector2(x, y).ToWorldCoordinates() - new Vector2(8, 8),
                             new Vector2(x, y).ToWorldCoordinates() + new Vector2(8, 8),
@@ -307,7 +295,7 @@ namespace NDMod.Common.Utilities
                             new Vector2(x, y).ToWorldCoordinates() + new Vector2(8, 8),
                             5, Color.Red, null);
                     }
-                    if (tileAroundSorroundTile[3].liquid > 0 && sorroundTile[3].liquid > 0)
+                    if (tileAroundSorroundTile[3].LiquidAmount > 0 && sorroundTile[3].LiquidAmount > 0)
                     {
                         Dust.QuickBox(new Vector2(x, y).ToWorldCoordinates() - new Vector2(8, 8),
                             new Vector2(x, y).ToWorldCoordinates() + new Vector2(8, 8),

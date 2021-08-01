@@ -6,6 +6,7 @@ using Terraria.ModLoader;
 using System.Collections.Generic;
 using Terraria.ID;
 using NDMod.Content.ModPlayers;
+using Microsoft.Xna.Framework.Audio;
 
 namespace NDMod.Common.Utilities
 {
@@ -21,9 +22,9 @@ namespace NDMod.Common.Utilities
 					onScreen = true;
 				else
 				{
-					Rectangle screenBounds = new Rectangle((int)(Main.screenPosition.X - (Main.screenWidth * 2)), (int)(Main.screenPosition.Y - (Main.screenHeight * 2)), Main.screenWidth * 5, Main.screenHeight * 5);
-					Rectangle rectFromVect = new Rectangle((int)position.X, (int)position.Y, 1, 1);
-					Vector2 midScreen = new Vector2(Main.screenPosition.X + Main.screenWidth / 2, Main.screenPosition.Y + Main.screenHeight / 2);
+					Rectangle screenBounds = new((int)(Main.screenPosition.X - (Main.screenWidth * 2)), (int)(Main.screenPosition.Y - (Main.screenHeight * 2)), Main.screenWidth * 5, Main.screenHeight * 5);
+					Rectangle rectFromVect = new((int)position.X, (int)position.Y, 1, 1);
+					Vector2 midScreen = new(Main.screenPosition.X + Main.screenWidth / 2, Main.screenPosition.Y + Main.screenHeight / 2);
 					if (rectFromVect.Intersects(screenBounds))
 						onScreen = true;
 					if (onScreen)
@@ -56,9 +57,9 @@ namespace NDMod.Common.Utilities
 					onScreen = true;
 				else
 				{
-					Rectangle screenBounds = new Rectangle((int)(Main.screenPosition.X - (Main.screenWidth * 2)), (int)(Main.screenPosition.Y - (Main.screenHeight * 2)), Main.screenWidth * 5, Main.screenHeight * 5);
-					Rectangle rectFromVect = new Rectangle((int)position.X, (int)position.Y, 1, 1);
-					Vector2 midScreen = new Vector2(Main.screenPosition.X + Main.screenWidth / 2, Main.screenPosition.Y + Main.screenHeight / 2);
+					Rectangle screenBounds = new((int)(Main.screenPosition.X - (Main.screenWidth * 2)), (int)(Main.screenPosition.Y - (Main.screenHeight * 2)), Main.screenWidth * 5, Main.screenHeight * 5);
+					Rectangle rectFromVect = new((int)position.X, (int)position.Y, 1, 1);
+					Vector2 midScreen = new(Main.screenPosition.X + Main.screenWidth / 2, Main.screenPosition.Y + Main.screenHeight / 2);
 					if (rectFromVect.Intersects(screenBounds))
 						onScreen = true;
 					if (onScreen)
@@ -83,5 +84,10 @@ namespace NDMod.Common.Utilities
 			}
 			return 0f;
 		}
+
+		public static SoundEffect GetSound(this Mod mod, string path)
+        {
+			return mod.Assets.Request<SoundEffect>(path, ReLogic.Content.AssetRequestMode.ImmediateLoad).Value;
+        }
 	}
 }

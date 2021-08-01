@@ -7,14 +7,14 @@ namespace NDMod.Content.Buffs
 {
     public class Cancer : ModBuff
     {
-        public override void SetDefaults()
+        public override void SetStaticDefaults()
         {
             DisplayName.SetDefault("Cancer");
             Description.SetDefault("You are permanently dying");
             Main.buffNoTimeDisplay[Type] = true;
             Main.persistentBuff[Type] = true;
             Main.buffNoSave[Type] = false;
-            canBeCleared = false;
+            CanBeCleared = false;
             Main.debuff[Type] = true;
         }
         public override void Update(Player player, ref int buffIndex)

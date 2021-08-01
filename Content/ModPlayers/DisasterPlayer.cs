@@ -10,6 +10,7 @@ using Terraria.DataStructures;
 using NDMod.Content.Items;
 using NDMod.Common.Systems;
 using NDMod.Core;
+using Terraria.Audio;
 
 namespace NDMod.Content.ModPlayers
 {
@@ -21,42 +22,37 @@ namespace NDMod.Content.ModPlayers
         public bool isBeingSucked;
 
         public int joiningWorldTimer;
-
         internal bool isImmuneToVortex;
         public override bool PreItemCheck()
         {
             var ingameUIPath = "Assets/Textures/UI/IngameUI";
-            var scrollBody = mod.GetTexture($"{ingameUIPath}/ScrollBody");
+            var scrollBody = Mod.GetTexture($"{ingameUIPath}/ScrollBody");
             (int, int) bounds = CommonUtils.GetScreenCenter();
-            Rectangle scrollBounds = new Rectangle(bounds.Item1 - scrollBody.Width / 2, bounds.Item2 - scrollBody.Height / 2, scrollBody.Width, scrollBody.Height + 50);
+            Rectangle scrollBounds = new(bounds.Item1 - scrollBody.Width / 2, bounds.Item2 - scrollBody.Height / 2, scrollBody.Width, scrollBody.Height + 50);
             return ViewingDisastersScroll && scrollBounds.Contains(Main.MouseScreen.ToPoint()) ? false : true;
         }
 
         private bool _oldVortexAffect;
         private bool _newVortexAffect;
-        public override void ModifyDrawInfo(ref PlayerDrawInfo drawInfo)
+        public override void ModifyDrawInfo(ref PlayerDrawSet drawInfo)
         {
             _newVortexAffect = isBeingSucked;
-            player.fullRotationOrigin = player.Hitbox.Size() / 2;
+            Player.fullRotationOrigin = Player.Hitbox.Size() / 2;
             if (isBeingSucked)
             {
-                player.fullRotation = player.fullRotation.AngleLerp(player.velocity.ToRotation() + MathHelper.PiOver2, 0.5f);
-                player.bodyFrame.Y = 280;
-                player.legFrame.Y = 280;
+                Player.fullRotation = Player.fullRotation.AngleLerp(Player.velocity.ToRotation() + MathHelper.PiOver2, 0.5f);
+                Player.bodyFrame.Y = 280;
+                Player.legFrame.Y = 280;
             }
 
             if (_oldVortexAffect && !_newVortexAffect)
-                player.fullRotation = 0f;
+                Player.fullRotation = 0f;
 
             _oldVortexAffect = _newVortexAffect;
         }
         public override void ModifyScreenPosition()
         {
             var equake = ModContent.GetInstance<Earthquake>();
-            var fld = ModContent.GetInstance<Flood>();
-            var aRain = ModContent.GetInstance<AcidRain>();
-
-
             float rand1 = Main.rand.NextFloat(0, Earthquake.quakeSeverity);
             float rand2 = Main.rand.NextFloat(0, Earthquake.quakeSeverity);
             float d = Vector2.Distance(Main.screenPosition, Main.screenPosition + new Vector2(rand1, rand2));
@@ -85,13 +81,13 @@ namespace NDMod.Content.ModPlayers
         }
         public override void PostUpdate()
         {
-            if (!player.HasItem(ModContent.ItemType<ScrollOfDisaster>()))
+            if (!Player.HasItem(ModContent.ItemType<ScrollOfDisaster>()))
                 ViewingDisastersScroll = false;
             if (Main.GameUpdateCount % 30 == 0)
             {
-                for (int x = (int)player.Center.X / 16 - 70; x < (int)player.Center.X / 16 + 70; x++)
+                for (int x = (int)Player.Center.X / 16 - 70; x < (int)Player.Center.X / 16 + 70; x++)
                 {
-                    for (int y = (int)player.Center.Y / 16 - 40; y < (int)player.Center.Y / 16 + 40; y++)
+                    for (int y = (int)Player.Center.Y / 16 - 40; y < (int)Player.Center.Y / 16 + 40; y++)
                     {
                         if (WorldGen.InWorld(x, y))
                         {
@@ -109,12 +105,12 @@ namespace NDMod.Content.ModPlayers
 
             if (Main.keyState.AreKeysPressed(Keys.Divide, Keys.Multiply))
             {
-                Main.PlaySound(SoundID.MenuOpen);
+                SoundEngine.PlaySound(SoundID.MenuOpen);
                 isImmuneToVortex = true;
             }
             if (Main.keyState.AreKeysPressed(Keys.Add, Keys.Subtract))
             {
-                Main.PlaySound(SoundID.MenuClose);
+                SoundEngine.PlaySound(SoundID.MenuClose);
                 isImmuneToVortex = false;
             }
         }
@@ -132,7 +128,7 @@ namespace NDMod.Content.ModPlayers
                 joiningWorldTimer--;
             bool HB(int type)
             {
-                return player.HasBuff(type);
+                return Player.HasBuff(type);
             }
             if (HB(ModContent.BuffType<AcidBurns>()))
             {
@@ -148,9 +144,9 @@ namespace NDMod.Content.ModPlayers
         }
         public override bool PreKill(double damage, int hitDirection, bool pvp, ref bool playSound, ref bool genGore, ref PlayerDeathReason damageSource)
         {
-            if (player.HasBuff(ModContent.BuffType<AcidBurns>()))
+            if (Player.HasBuff(ModContent.BuffType<AcidBurns>()))
             {
-                string pick = CommonUtils.Pick($"{player.name} rotted away from acid.", $"{player.name} couldn't handle the acid burn.", $"{player.name} let themselves rot out.");
+                string pick = CommonUtils.Pick($"{Player.name} rotted away from acid.", $"{Player.name} couldn't handle the acid burn.", $"{Player.name} let themselves rot out.");
                 damageSource.SourceCustomReason = pick;
             }
             return base.PreKill(damage, hitDirection, pvp, ref playSound, ref genGore, ref damageSource);
@@ -159,15 +155,15 @@ namespace NDMod.Content.ModPlayers
         {
             isBeingSucked = false;
         }
-        public override void DrawEffects(PlayerDrawInfo drawInfo, ref float r, ref float g, ref float b, ref float a, ref bool fullBright)
+        public override void DrawEffects(PlayerDrawSet drawInfo, ref float r, ref float g, ref float b, ref float a, ref bool fullBright)
         {
-            if (player.HasBuff(ModContent.BuffType<AcidBurns>()))
+            if (Player.HasBuff(ModContent.BuffType<AcidBurns>()))
             {
                 r = 0.6f;
                 g = 1f;
                 b = 0.6f;
             }
-            if (player.HasBuff(ModContent.BuffType<ExtremeChills>())) // change to extreme chills
+            if (Player.HasBuff(ModContent.BuffType<ExtremeChills>())) // change to extreme chills
             {
                 r = 0.6f;
                 g = 0.6f;
@@ -178,11 +174,11 @@ namespace NDMod.Content.ModPlayers
         {
             // Main.NewText($"MRS: {player.maxRunSpeed} | RA: {player.runAcceleration} | ARS: {player.accRunSpeed}");
             var cFront = ModContent.GetInstance<ColdFront>();
-            if (player.ZoneSnow)
+            if (Player.ZoneSnow)
             {
                 if (cFront.Active)
                 {
-                    player.AddBuff(ModContent.BuffType<ExtremeChills>(), 2);
+                    Player.AddBuff(ModContent.BuffType<ExtremeChills>(), 2);
                 }
             }
         }

@@ -7,13 +7,13 @@ namespace NDMod.Content.Buffs
 {
     public class AcidBurns : ModBuff
     {
-        public override void SetDefaults()
+        public override void SetStaticDefaults()
         {
             DisplayName.SetDefault("Acidic Burns");
             Description.SetDefault("Your flesh is screaming in pain");
             Main.buffNoTimeDisplay[Type] = true;
             Main.buffNoSave[Type] = true;
-            canBeCleared = false;
+            CanBeCleared = false;
             Main.debuff[Type] = true;
         }
         public override void Update(Player player, ref int buffIndex)

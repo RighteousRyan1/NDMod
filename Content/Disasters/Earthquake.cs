@@ -22,14 +22,6 @@ namespace NDMod.Content.Disasters
         public override int MaxDuration => 5500;
         public override float ChanceToOccur => 0.001f;
         public override int MinDuration => 4500;
-        public override bool OnEnd()
-        {
-            return base.OnEnd();
-        }
-        public override bool OnBegin()
-        {
-            return base.OnBegin();
-        }
         /// <summary>
         /// What the quake scale attempts to crawl to via steps.
         /// </summary>
@@ -37,7 +29,7 @@ namespace NDMod.Content.Disasters
         public override void UpdateActive()
         {
             // Main.NewText(duration);
-            Player player = Main.player[Main.myPlayer].GetModPlayer<DisasterPlayer>().player;
+            Player player = Main.player[Main.myPlayer].GetModPlayer<DisasterPlayer>().Player;
             // Activity is handled in a ModPlayer.
 
             bool getUnusuallyHighQuakeScale = Main.rand.NextFloat() < 0.175f;

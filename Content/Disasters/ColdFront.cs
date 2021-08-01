@@ -19,14 +19,6 @@ namespace NDMod.Content.Disasters
     {
         public override int MaxDuration => 29000;
         public override float ChanceToOccur => 0.005f;
-        public override bool OnEnd()
-        {
-            return base.OnEnd();
-        }
-        public override bool OnBegin()
-        {
-            return base.OnBegin();
-        }
         public override void UpdateActive()
         {
             var p = Main.player[Main.myPlayer];

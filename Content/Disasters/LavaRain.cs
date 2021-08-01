@@ -22,7 +22,7 @@ namespace NDMod.Content.Disasters
         public override void UpdateActive()
         {
             var player = Main.player[Main.myPlayer];
-            Vector2 worldCoords = new Vector2(player.Center.X + Main.rand.NextFloat(3000, -3000), player.Center.Y - Main.rand.NextFloat(1100, 1450));
+            Vector2 worldCoords = new(player.Center.X + Main.rand.NextFloat(3000, -3000), player.Center.Y - Main.rand.NextFloat(1100, 1450));
             if (Main.rand.NextFloat() <= 0.05f && WorldGen.InWorld((int)(worldCoords / 16).X, (int)(worldCoords / 16).Y))
             {
                 Point tileCoords = (worldCoords / 16).ToPoint();
@@ -32,8 +32,8 @@ namespace NDMod.Content.Disasters
 
 
                 //Main.NewText("Hit! Spawned at " + tileCoords);
-                tile.liquidType(1);
-                tile.liquid = 1;
+                tile.LiquidType = 1;
+                tile.LiquidAmount = 1;
                 WorldGen.SquareTileFrame(tileCoords.X, tileCoords.Y);
             }
         }

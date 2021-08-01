@@ -22,19 +22,16 @@ namespace NDMod.Content.Items
         }
         public override void SetDefaults()
         {
-            item.width = 16;
-            item.height = 16;
-            item.rare = ItemRarityID.Pink;
-        }
-        public override void UpdateInventory(Player player)
-        {
+            Item.width = 16;
+            Item.height = 16;
+            Item.rare = ItemRarityID.Pink;
         }
         public override void ModifyTooltips(List<TooltipLine> tooltips)
         {
             foreach (ModDisaster disaster in NDMod.ModDisasters)
             {
                 bool isSinkhole = disaster.Name.Equals("Sinkhole");
-                tooltips.Add(new TooltipLine(mod, "AllDisasters", $"{disaster.Name}: " + (!isSinkhole ? (disaster.Active ? "Active" : "Inactive") : $"Last occurred {Disasters.Sinkhole.timeType}"))
+                tooltips.Add(new(Mod, "AllDisasters", $"{disaster.Name}: " + (!isSinkhole ? (disaster.Active ? "Active" : "Inactive") : $"Last occurred {Disasters.Sinkhole.timeType}"))
                 {
                     overrideColor = disaster.Active ? Color.LimeGreen : Main.errorColor
                 });

@@ -8,10 +8,10 @@ using System.Linq;
 
 namespace NDMod.Core
 {
-    public class DisasterIO : ModWorld
+    public class DisasterIO : ModSystem
     {
-        public Dictionary<string, int> nameDurations = new Dictionary<string, int>();
-        public override TagCompound Save()
+        public Dictionary<string, int> nameDurations = new();
+        public override TagCompound SaveWorldData()
         {
             nameDurations.Clear();
             foreach (ModDisaster disaster in NDMod.ModDisasters)
@@ -30,12 +30,9 @@ namespace NDMod.Core
                 { "dDuration", nameDurations.Values.ToList() }
             };
         }
-        public override void Initialize()
+        public override void LoadWorldData(TagCompound tag)
         {
-            nameDurations.Clear();
-        }
-        public override void Load(TagCompound tag)
-        {
+            // nameDurations.Clear();
             var names = tag.Get<List<string>>("dName");
             var values = tag.Get<List<int>>("dDuration");
             for (int i = 0; i < names.Count; i++)

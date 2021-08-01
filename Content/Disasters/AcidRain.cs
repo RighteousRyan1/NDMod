@@ -11,6 +11,8 @@ using Terraria.ModLoader;
 using NDMod.Content.Buffs;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Audio;
+using NDMod.Common.Utilities;
+using Terraria.GameContent;
 
 namespace NDMod.Content.Disasters
 {
@@ -20,21 +22,14 @@ namespace NDMod.Content.Disasters
         public static SoundEffectInstance SFXISizzle;
         public override int MaxDuration => 12000;
         public override float ChanceToOccur => 0.000015f;
-        public override bool OnEnd()
-        {
-            return base.OnEnd();
-        }
-        public override bool OnBegin()
-        {
-            return base.OnBegin();
-        }
         public override void UpdateActive()
         {
+            var rainTexture = TextureAssets.Rain.Value;
             // def = 0.16f
             Main.maxRaining = 0.6f;
-            Texture2D acidRain = ModContent.GetInstance<NDMod>().GetTexture("Assets/Textures/AcidRain");
-            if (Main.rainTexture == rainTex)
-                Main.rainTexture = acidRain;
+            Texture2D acidRain = Mod.GetTexture("Assets/Textures/AcidRain");
+            if (rainTexture == rainTex)
+                rainTexture = acidRain;
             var p = Main.player[Main.myPlayer];
 
             foreach (Rain rain in Main.rain)
@@ -60,26 +55,22 @@ namespace NDMod.Content.Disasters
 		}
         public override void UpdateInactive()
         {
-            Texture2D acidRain = ModContent.GetInstance<NDMod>().GetTexture("Assets/Textures/AcidRain");
-            if (Main.rainTexture == acidRain)
-            {
-                Main.rainTexture = rainTex;
-            }
+            var rainTexture = TextureAssets.Rain.Value;
+            Texture2D acidRain = Mod.GetTexture("Assets/Textures/AcidRain");
+            if (rainTexture == acidRain)
+                rainTexture = rainTex;
         }
         public override string Name => "Acid Rain";
         public override bool CanActivate => Main.raining && ModContent.GetInstance<DisasterConfig>().disasterEnabled_AcidRain && !ModContent.GetInstance<Hailstorm>().Active && base.CanActivate;
         public override int Cooldown => 32000;
         public override int MinDuration => 8000;
-        public override void UpdateAlways()
-        {
-        }
         public static Texture2D rainTex;
         public override void Initialize()
         {
             Mod mod = ModContent.GetInstance<NDMod>();
             if (!Main.dedServ)
             {
-                rainTex = Main.rainTexture;
+                rainTex = TextureAssets.Rain.Value;
 
                 SFXSizzle = mod.GetSound("Assets/SoundEffects/Sizzle");
                 SFXISizzle = SFXSizzle.CreateInstance();
@@ -90,7 +81,8 @@ namespace NDMod.Content.Disasters
         }
         public override void SaveAndQuit()
         {
-            Main.rainTexture = rainTex;
+            var rainTexture = TextureAssets.Rain.Value;
+            rainTexture = rainTex;
             SFXISizzle.Volume = 0f;
         }
         public override bool ShouldTownNPCsGoToHomes => true;

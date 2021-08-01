@@ -19,7 +19,7 @@ namespace NDMod.Common
     /// </summary>
     public class ModDisaster
     {
-        public Mod mod => ModLoader.Mods.First(mod => mod.Code == GetType().Assembly);
+        public Mod Mod => ModLoader.Mods.First(mod => mod.Code == GetType().Assembly);
         /// <summary>
         /// The current duration of the disaster. This is how much longer it will last for.
         /// </summary>

@@ -18,37 +18,16 @@ namespace NDMod.Content.Disasters
         public override bool ShouldTownNPCsGoToHomes => true;
         public override int MaxDuration => 17250;
         public override float ChanceToOccur => 0.000025f;
-        public override bool OnEnd()
-        {
-            return base.OnEnd();
-        }
-        public override bool OnBegin()
-        {
-            return base.OnBegin();
-        }
         public override void UpdateActive()
         {
-            var player = Main.player[Main.myPlayer].GetModPlayer<CancerPlayer>().player;
+            var player = Main.player[Main.myPlayer].GetModPlayer<CancerPlayer>().Player;
             var cancerPlayer = Main.player[Main.myPlayer].GetModPlayer<CancerPlayer>();
 
             var bodyTile = Main.tile[(int)player.Top.X / 16 + 1, (int)player.Top.Y / 16 + 1];
             Item item = player.HeldItem;
-            bool heldItemIsNotTorch = item.createTile != TileID.Torches;
-
-            bool dry = false;
-            bool wet = false;
-            bool glowStick = false;
-            if (item.modItem != null)
-            {
-                ItemLoader.AutoLightSelect(item, ref dry, ref wet, ref glowStick);
-
-                if (dry || wet || glowStick)
-                {
-                    heldItemIsNotTorch = false;
-                }
-            }
+            bool heldTorch = ItemID.Sets.Torches[item.type];
             // If the lighting is greater than 15% on the player's center and the player center's tile's wall is 0 (not there), increase
-            if (heldItemIsNotTorch && Lighting.GetSubLight(player.Center).X < 0.15f)
+            if (heldTorch && Lighting.GetSubLight(player.Center).X < 0.15f)
             {
                 if (CancerPlayer.shadersIntensity > 0.02f)
                     CancerPlayer.shadersIntensity -= 0.005f;
@@ -74,7 +53,6 @@ namespace NDMod.Content.Disasters
         }
         public override void UpdateInactive()
         {
-            var player = Main.player[Main.myPlayer].GetModPlayer<CancerPlayer>().player;
             var cancerPlayer = Main.player[Main.myPlayer].GetModPlayer<CancerPlayer>();
 
             if (CancerPlayer.shadersIntensity > 0.02f)

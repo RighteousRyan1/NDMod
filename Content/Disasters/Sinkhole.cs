@@ -23,14 +23,14 @@ namespace NDMod.Content.Disasters
         {
             if (Main.player[Main.myPlayer].GetModPlayer<DisasterPlayer>().nearChests)
             {
-                mod.Logger.Debug("Failed to place sinkhole. No suitable place found.");
+                Mod.Logger.Debug("Failed to place sinkhole. No suitable place found.");
                 return;
             }
             WorldUtils.TryGenerateSinkholeNatural(out bool sunk);
 
             if (sunk)
             {
-                mod.Logger.Debug("Found a place for a sinkhole!");
+                Mod.Logger.Debug("Found a place for a sinkhole!");
                 lastOcurrance = 0;
             }
         }

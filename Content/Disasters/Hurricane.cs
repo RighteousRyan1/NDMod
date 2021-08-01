@@ -42,21 +42,25 @@ namespace NDMod.Content.Disasters
         {
             Main.maxRaining = 1f;
             Main.numClouds = 60;
-            for (int i = 0; i < Main.ActivePlayersCount; i++)
+            int total = 0;
+            foreach (var p in Main.player)
+                if (p.active)
+                    total++;
+            for (int i = 0; i < total; i++)
             {
                 var player = Main.player[i];
                 if (!player.behindBackWall && player.ZoneOverworldHeight)
                     player.AddBuff(BuffID.WindPushed, 2, true);
             }
 
-            MathUtils.RoughStep(ref Main.windSpeed, _windSpeedApproachable, 0.0025f);
+            MathUtils.RoughStep(ref Main.windSpeedCurrent, _windSpeedApproachable, 0.0025f);
         }
         public override void UpdateInactive()
         {
             if (_timerWindSpeedChange > 0)
             {
                 _timerWindSpeedChange--;
-                MathUtils.RoughStep(ref Main.windSpeed, _windSpeedApproachable, 0.075f);
+                MathUtils.RoughStep(ref Main.windSpeedCurrent, _windSpeedApproachable, 0.075f);
             }
         }
         public override string Name => "Hurricane";

@@ -17,13 +17,12 @@ namespace NDMod.Content.ModPlayers
     {
         public bool hasCancer;
         public float solarFlareExposure;
-
         public static float shadersIntensity;
         public override void PostUpdate()
         {
             const float twentyTwoPointThree = 60 * 22.3f;
             if (hasCancer)
-                player.AddBuff(ModContent.BuffType<Cancer>(), 2, false);
+                Player.AddBuff(ModContent.BuffType<Cancer>(), 2, false);
             if (solarFlareExposure >= twentyTwoPointThree)
                 hasCancer = true;
         }
@@ -32,14 +31,10 @@ namespace NDMod.Content.ModPlayers
             solarFlareExposure = 0;
             hasCancer = false;
         }
-        public override void UpdateBiomeVisuals()
-        {
-            player.ManageSpecialBiomeVisuals("SolarFlare", true);
-            player.ManageSpecialBiomeVisuals("OrangeVignette", true);
-        }
         public override void NaturalLifeRegen(ref float regen)
         {
-            regen = 0;
+            if (hasCancer)
+                regen = 0;
         }
         public override TagCompound Save()
         {

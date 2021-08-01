@@ -23,23 +23,23 @@ namespace NDMod.Content.Items
         }
         public override void SetDefaults()
         {
-            item.width = 16;
-            item.height = 16;
-            item.useAnimation = 20;
-            item.useTime = 20;
-            item.useStyle = ItemUseStyleID.HoldingUp;
-            item.rare = ItemRarityID.Quest;
+            Item.width = 16;
+            Item.height = 16;
+            Item.useAnimation = 20;
+            Item.useTime = 20;
+            Item.useStyle = ItemUseStyleID.HoldUp;
+            Item.rare = ItemRarityID.Quest;
         }
         public override void UpdateInventory(Player player)
         {
-            var sfx = mod.GetSound("Assets/SoundEffects/PageOpen");
+            var sfx = Mod.Assets.Request<SoundEffect>("Assets/SoundEffects/PageOpen", ReLogic.Content.AssetRequestMode.ImmediateLoad).Value;
             if (_pageFlip != sfx)
             {
                 _pageFlip = sfx;
                 _iPageFlip = _pageFlip.CreateInstance();
             }
         }
-        public override bool UseItem(Player player)
+        public override bool? UseItem(Player player)
         {
             if (player.itemAnimation == 1)
             {
@@ -49,7 +49,7 @@ namespace NDMod.Content.Items
             }
             return base.UseItem(player);
         }
-        public override bool CanBurnInLava()
+        public override bool? CanBurnInLava()
         {
             return true;
         }

@@ -7,13 +7,13 @@ namespace NDMod.Content.Buffs
 {
     public class ExtremeChills : ModBuff
     {
-        public override void SetDefaults()
+        public override void SetStaticDefaults()
         {
             DisplayName.SetDefault("Extreme Chills");
             Description.SetDefault("You feel pieces of your skin freezing...\nExtremely reduced movement");
             Main.buffNoTimeDisplay[Type] = true;
             Main.buffNoSave[Type] = true;
-            canBeCleared = false;
+            CanBeCleared = false;
             Main.debuff[Type] = true;
         }
         public override void Update(Player player, ref int buffIndex)

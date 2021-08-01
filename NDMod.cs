@@ -7,92 +7,33 @@ using System;
 using Microsoft.Xna.Framework;
 using NDMod.Content.ModPlayers;
 using MonoMod.Cil;
-using Mono.Cecil.Cil;
-using System.Reflection;
 using Microsoft.Xna.Framework.Graphics;
 using ReLogic.Graphics;
 using Terraria.UI.Chat;
 using Microsoft.Xna.Framework.Input;
 using NDMod.Common.Enums;
-using System.Linq;
 using NDMod.Content.Disasters;
 using Terraria.ID;
 using Terraria.Graphics.Shaders;
 using Terraria.Graphics.Effects;
 using Terraria.GameContent;
+using Terraria.DataStructures;
+using Terraria.Audio;
 
 namespace NDMod
 {
+    public class GenericProjectileSpawnSource : IProjectileSource { }
     public class NDMod : Mod
     {
-        public static ModHotKey GoBackInScrollUI;
+        public static ModKeybind GoBackInScrollUI;
         public static List<ModDisaster> ModDisasters { get; private set; } = new List<ModDisaster>();
         public static List<ModDisaster> ModdedDisasters { get; private set; } = new List<ModDisaster>();
 
         public static UIHelper UIUtils => UIHelper.GetInstance();
 
-        private ScreenShaderData _dataWaveSolar;
-        private ScreenShaderData _dataOrangeVignette;
         public override void Load()
         {
-            GoBackInScrollUI = RegisterHotKey("Return (Scroll UI)", "Escape");
-
-            if (Main.netMode != NetmodeID.Server)
-            {
-                Ref<Effect> WaveSolarFlare = new Ref<Effect>(GetEffect("Effects/SolarFlare"));
-                _dataWaveSolar = new ScreenShaderData(WaveSolarFlare, "SolarFlare");
-                Filters.Scene["SolarFlare"] = new Filter(_dataWaveSolar, EffectPriority.VeryHigh);
-
-                Ref<Effect> OrangeVignette = new Ref<Effect>(GetEffect("Effects/OrangeVignette"));
-                _dataOrangeVignette = new ScreenShaderData(OrangeVignette, "OrangeVignette");
-                Filters.Scene["OrangeVignette"] = new Filter(_dataOrangeVignette, EffectPriority.High);
-            }
-            darkeningColor = new Color(33, 33, 33);
-
-        }
-
-        private Color darkeningColor;
-        private Color _solarFlareBGColor;
-        public override void ModifyLightingBrightness(ref float scale)
-        {
-            if (ModContent.GetInstance<Blackout>().Active)
-                scale = 0.85f;
-        }
-        public override void ModifySunLightColor(ref Color tileColor, ref Color backgroundColor)
-        {
-            _solarFlareBGColor = Color.Orange;
-            if (ModContent.GetInstance<SolarFlare>().Active)
-            {
-                backgroundColor = _solarFlareBGColor;
-                tileColor = _solarFlareBGColor;
-            }
-            else
-            {
-                _solarFlareBGColor = backgroundColor;
-            }
-            if (ModContent.GetInstance<Blackout>().Active)
-            {
-                backgroundColor = darkeningColor;
-                tileColor = darkeningColor;
-
-                if (darkeningColor.R > 0)
-                {
-                    darkeningColor.R--;
-                    darkeningColor.G--;
-                    darkeningColor.B--;
-                }
-            }
-            if (Blackout.bgStopModifyTimer > 0 && !ModContent.GetInstance<Blackout>().Active)
-            {
-                tileColor = darkeningColor;
-                backgroundColor = darkeningColor;
-                if (darkeningColor.R < 150)
-                {
-                    darkeningColor.R++;
-                    darkeningColor.G++;
-                    darkeningColor.B++;
-                }
-            }
+            GoBackInScrollUI = KeybindLoader.RegisterKeybind(this, "Return (Scroll UI)", Keys.Escape);
         }
         public override void PostSetupContent()
         {
@@ -129,7 +70,7 @@ namespace NDMod
                 {
                     num = 218;
                 }
-                var dust = Dust.NewDustDirect(self.position - self.velocity, 2, 2, ModContent.GetInstance<AcidRain>().Active ? DustID.BubbleBurst_Green : num);
+                var dust = Dust.NewDustDirect(self.position - self.velocity, 2, 2, ModContent.GetInstance<AcidRain>().Active ? DustID.GreenTorch : num);
 
                 dust.position.X -= 2f;
                 dust.alpha = 38;
@@ -146,7 +87,6 @@ namespace NDMod
 
             GoBackInScrollUI = null;
         }
-
         private void GoToHomes(ILContext il)
         {
             /*
@@ -194,38 +134,21 @@ namespace NDMod
             }
             return false;
         }
-        public override void PreSaveAndQuit()
-        {
-            Earthquake.SFXICrumble.Volume = 0f;
-            AcidRain.SFXISizzle.Volume = 0f;
-            CancerPlayer.shadersIntensity = 0f;
-            DisasterPlayer.ViewingDisastersScroll = false;
-            foreach (ModDisaster disaster in ModDisasters)
-            {
-                disaster.SaveAndQuit();
-            }
-        }
         internal int mode;
         private void Main_DrawInterface_30_Hotbar(On.Terraria.Main.orig_DrawInterface_30_Hotbar orig, Main self)
         {
-            if (Main.keyState.KeyJustPressed(Keys.P))
-            {
-                var m = Projectile.NewProjectileDirect(Main.MouseWorld, Vector2.Zero, ModContent.ProjectileType<Content.Projectiles.VortexPurple>(), 50, 0, Main.myPlayer);
-
-                m.timeLeft = 300;
-            }
             orig(self);
-            List<ModDisaster> disasters = new List<ModDisaster>();
+            List<ModDisaster> disasters = new();
             foreach (ModDisaster d in ModDisasters)
                 disasters.Add(d);
             if (Main.keyState.KeyJustPressed(Keys.Up) && mode < disasters.Count - 1)
             {
-                Main.PlaySound(SoundID.MenuTick);
+                SoundEngine.PlaySound(SoundID.MenuTick);
                 mode++;
             }
             if (Main.keyState.KeyJustPressed(Keys.Down) && mode > 0)
             {
-                Main.PlaySound(SoundID.MenuTick);
+                SoundEngine.PlaySound(SoundID.MenuTick);
                 mode--;
             }
             if (Main.keyState.KeyJustPressed(Keys.End))
@@ -233,35 +156,15 @@ namespace NDMod
             if (Main.keyState.KeyJustPressed(Keys.Home))
                 disasters[mode].TryBeginRestartCooldown();
 
-            Main.spriteBatch.DrawString(Main.fontMouseText, $"{disasters[mode].Name} ({disasters[mode].GetType().Name})", new Vector2(8, Main.screenHeight - 50), Color.White, 0f, Vector2.Zero, 0.5f, default, 1f);
-            Main.spriteBatch.DrawString(Main.fontMouseText, "Home: Start | End: Stop", new Vector2(8, Main.screenHeight - 36), Color.White, 0f, Vector2.Zero, 0.5f, default, 1f);
-            Main.spriteBatch.DrawString(Main.fontMouseText, $"dur: {disasters[mode].duration} | cd: {disasters[mode].cdTimer}", new Vector2(8, Main.screenHeight - 64), Color.White, 0f, Vector2.Zero, 0.5f, default, 1f);
+            Main.spriteBatch.DrawString(FontAssets.MouseText.Value, $"{disasters[mode].Name} ({disasters[mode].GetType().Name})", new Vector2(8, Main.screenHeight - 50), Color.White, 0f, Vector2.Zero, 0.5f, default, 1f);
+            Main.spriteBatch.DrawString(FontAssets.MouseText.Value, "Home: Start | End: Stop", new Vector2(8, Main.screenHeight - 36), Color.White, 0f, Vector2.Zero, 0.5f, default, 1f);
+            Main.spriteBatch.DrawString(FontAssets.MouseText.Value, $"dur: {disasters[mode].duration} | cd: {disasters[mode].cdTimer}", new Vector2(8, Main.screenHeight - 64), Color.White, 0f, Vector2.Zero, 0.5f, default, 1f);
 
             if (DisasterPlayer.ViewingDisastersScroll)
             {
                 DrawScrollUI();
                 DrawChildren_ScrollUI();
                 Main.isMouseLeftConsumedByUI = true;
-            }
-        }
-
-        public override void PostUpdateEverything()
-        {
-            if (Main.keyState.KeyJustPressed(Keys.P))
-            {
-                // Main.NewText("Getting liquid pool...");
-                // WorldUtils.GetLiquidPool((Main.MouseWorld / 16).ToPoint(), new Point(20, 20), true);
-            }
-            _dataWaveSolar?.UseIntensity(CancerPlayer.shadersIntensity);
-            _dataOrangeVignette?.UseIntensity(CancerPlayer.shadersIntensity);
-            foreach (ModDisaster disaster in ModDisasters)
-            {
-                disaster.Update();
-
-                if (disaster.Active)
-                    disaster.UpdateActive();
-                else
-                    disaster.UpdateInactive();
             }
         }
 
@@ -419,7 +322,7 @@ namespace NDMod
                         adjust = str.Remove(str.Length - 1, str[str.Length - 1] == 's' ? 1 : 0).Replace(" ", string.Empty);
                         ScrollUI = Enum.TryParse(adjust, out ScrollUIMode changeTo) ? changeTo : ScrollUIMode.Main;
                         if (str == "Coming Soon")
-                            Main.PlaySound(SoundID.Unlock);
+                            SoundEngine.PlaySound(SoundID.Unlock);
                     }, ref buttonScales[i], false, coolColor, 0, null, new Color(coolColor.R - 40, coolColor.G - 40, coolColor.B - 40));
                 }
             }
@@ -575,7 +478,7 @@ namespace NDMod
                     foreach (string strArr in explainEquakes)
                     {
                         i++;
-                        ChatManager.DrawColorCodedStringWithShadow(Main.spriteBatch, Main.fontDeathText, strArr, new Vector2(center.Item1, center.Item2 - 125 + (i - 1) * 25), Color.White, 0f, Main.fontDeathText.MeasureString(strArr) / 2, new Vector2(0.3f), -1, 1);
+                        ChatManager.DrawColorCodedStringWithShadow(Main.spriteBatch, FontAssets.DeathText.Value, strArr, new Vector2(center.Item1, center.Item2 - 125 + (i - 1) * 25), Color.White, 0f, FontAssets.DeathText.Value.MeasureString(strArr) / 2, new Vector2(0.3f), -1, 1);
                     }
                     break;
                 case ScrollUIMode.AcidRain:
@@ -584,7 +487,7 @@ namespace NDMod
                     foreach (string strArr in explainARain)
                     {
                         j++;
-                        ChatManager.DrawColorCodedStringWithShadow(Main.spriteBatch, Main.fontDeathText, strArr, new Vector2(center.Item1, center.Item2 - 125 + (j - 1) * 25), Color.White, 0f, Main.fontDeathText.MeasureString(strArr) / 2, new Vector2(0.3f), -1, 1);
+                        ChatManager.DrawColorCodedStringWithShadow(Main.spriteBatch, FontAssets.DeathText.Value, strArr, new Vector2(center.Item1, center.Item2 - 125 + (j - 1) * 25), Color.White, 0f, FontAssets.DeathText.Value.MeasureString(strArr) / 2, new Vector2(0.3f), -1, 1);
                     }
                     break;
                 case ScrollUIMode.ColdFront:
@@ -593,7 +496,7 @@ namespace NDMod
                     foreach (string strArr in explainCFronts)
                     {
                         b++;
-                        ChatManager.DrawColorCodedStringWithShadow(Main.spriteBatch, Main.fontDeathText, strArr, new Vector2(center.Item1, center.Item2 - 125 + (b - 1) * 25), Color.White, 0f, Main.fontDeathText.MeasureString(strArr) / 2, new Vector2(0.3f), -1, 1);
+                        ChatManager.DrawColorCodedStringWithShadow(Main.spriteBatch, FontAssets.DeathText.Value, strArr, new Vector2(center.Item1, center.Item2 - 125 + (b - 1) * 25), Color.White, 0f, FontAssets.DeathText.Value.MeasureString(strArr) / 2, new Vector2(0.3f), -1, 1);
                     }
                     break;
                 case ScrollUIMode.Flood:
@@ -602,7 +505,7 @@ namespace NDMod
                     foreach (string strArr in explainFloods)
                     {
                         z++;
-                        ChatManager.DrawColorCodedStringWithShadow(Main.spriteBatch, Main.fontDeathText, strArr, new Vector2(center.Item1, center.Item2 - 125 + (z - 1) * 25), Color.White, 0f, Main.fontDeathText.MeasureString(strArr) / 2, new Vector2(0.3f), -1, 1);
+                        ChatManager.DrawColorCodedStringWithShadow(Main.spriteBatch, FontAssets.DeathText.Value, strArr, new Vector2(center.Item1, center.Item2 - 125 + (z - 1) * 25), Color.White, 0f, FontAssets.DeathText.Value.MeasureString(strArr) / 2, new Vector2(0.3f), -1, 1);
                     }
                     break;
                 case ScrollUIMode.Vortex:
@@ -611,7 +514,7 @@ namespace NDMod
                     foreach (string strArr in explainVortexes)
                     {
                         q++;
-                        ChatManager.DrawColorCodedStringWithShadow(Main.spriteBatch, Main.fontDeathText, strArr, new Vector2(center.Item1, center.Item2 - 125 + (q - 1) * 25), Color.White, 0f, Main.fontDeathText.MeasureString(strArr) / 2, new Vector2(0.3f), -1, 1);
+                        ChatManager.DrawColorCodedStringWithShadow(Main.spriteBatch, FontAssets.DeathText.Value, strArr, new Vector2(center.Item1, center.Item2 - 125 + (q - 1) * 25), Color.White, 0f, FontAssets.DeathText.Value.MeasureString(strArr) / 2, new Vector2(0.3f), -1, 1);
                     }
                     break;
                 case ScrollUIMode.SolarFlare:
@@ -620,7 +523,7 @@ namespace NDMod
                     foreach (string strArr in explainSFlares)
                     {
                         s++;
-                        ChatManager.DrawColorCodedStringWithShadow(Main.spriteBatch, Main.fontDeathText, strArr, new Vector2(center.Item1, center.Item2 - 125 + (s - 1) * 25), Color.White, 0f, Main.fontDeathText.MeasureString(strArr) / 2, new Vector2(0.3f), -1, 1);
+                        ChatManager.DrawColorCodedStringWithShadow(Main.spriteBatch, FontAssets.DeathText.Value, strArr, new Vector2(center.Item1, center.Item2 - 125 + (s - 1) * 25), Color.White, 0f, FontAssets.DeathText.Value.MeasureString(strArr) / 2, new Vector2(0.3f), -1, 1);
                     }
                     break;
                 case ScrollUIMode.Thunderstorm:
@@ -629,7 +532,7 @@ namespace NDMod
                     foreach (string strArr in explainTStorms)
                     {
                         t++;
-                        ChatManager.DrawColorCodedStringWithShadow(Main.spriteBatch, Main.fontDeathText, strArr, new Vector2(center.Item1, center.Item2 - 125 + (t   - 1) * 25), Color.White, 0f, Main.fontDeathText.MeasureString(strArr) / 2, new Vector2(0.3f), -1, 1);
+                        ChatManager.DrawColorCodedStringWithShadow(Main.spriteBatch, FontAssets.DeathText.Value, strArr, new Vector2(center.Item1, center.Item2 - 125 + (t   - 1) * 25), Color.White, 0f, FontAssets.DeathText.Value.MeasureString(strArr) / 2, new Vector2(0.3f), -1, 1);
                     }
                     break;
                 case ScrollUIMode.Blackout:
@@ -638,7 +541,7 @@ namespace NDMod
                     foreach (string strArr in explainENight)
                     {
                         g++;
-                        ChatManager.DrawColorCodedStringWithShadow(Main.spriteBatch, Main.fontDeathText, strArr, new Vector2(center.Item1, center.Item2 - 125 + (g - 1) * 25), Color.White, 0f, Main.fontDeathText.MeasureString(strArr) / 2, new Vector2(0.3f), -1, 1);
+                        ChatManager.DrawColorCodedStringWithShadow(Main.spriteBatch, FontAssets.DeathText.Value, strArr, new Vector2(center.Item1, center.Item2 - 125 + (g - 1) * 25), Color.White, 0f, FontAssets.DeathText.Value.MeasureString(strArr) / 2, new Vector2(0.3f), -1, 1);
                     }
                     break;
                 case ScrollUIMode.Hailstorm:
@@ -647,7 +550,7 @@ namespace NDMod
                     foreach (string strArr in explainHStorms)
                     {
                         h++;
-                        ChatManager.DrawColorCodedStringWithShadow(Main.spriteBatch, Main.fontDeathText, strArr, new Vector2(center.Item1, center.Item2 - 125 + (h - 1) * 25), Color.White, 0f, Main.fontDeathText.MeasureString(strArr) / 2, new Vector2(0.3f), -1, 1);
+                        ChatManager.DrawColorCodedStringWithShadow(Main.spriteBatch, FontAssets.DeathText.Value, strArr, new Vector2(center.Item1, center.Item2 - 125 + (h - 1) * 25), Color.White, 0f, FontAssets.DeathText.Value.MeasureString(strArr) / 2, new Vector2(0.3f), -1, 1);
                     }
                     break;
                 case ScrollUIMode.Sinkhole:
@@ -656,7 +559,7 @@ namespace NDMod
                     foreach (string strArr in explainSinkholes)
                     {
                         v++;
-                        ChatManager.DrawColorCodedStringWithShadow(Main.spriteBatch, Main.fontDeathText, strArr, new Vector2(center.Item1, center.Item2 - 125 + (v - 1) * 25), Color.White, 0f, Main.fontDeathText.MeasureString(strArr) / 2, new Vector2(0.3f), -1, 1);
+                        ChatManager.DrawColorCodedStringWithShadow(Main.spriteBatch, FontAssets.DeathText.Value, strArr, new Vector2(center.Item1, center.Item2 - 125 + (v - 1) * 25), Color.White, 0f, FontAssets.DeathText.Value.MeasureString(strArr) / 2, new Vector2(0.3f), -1, 1);
                     }
                     break;
                 case ScrollUIMode.Index:
@@ -664,31 +567,31 @@ namespace NDMod
                     foreach (string strArr in indexes)
                     {
                         m++;
-                        ChatManager.DrawColorCodedStringWithShadow(Main.spriteBatch, Main.fontDeathText, strArr, new Vector2(center.Item1, center.Item2 - 125 + (m - 1) * 25), Color.White, 0f, Main.fontDeathText.MeasureString(strArr) / 2, new Vector2(0.3f), -1, 1);
+                        ChatManager.DrawColorCodedStringWithShadow(Main.spriteBatch, FontAssets.DeathText.Value, strArr, new Vector2(center.Item1, center.Item2 - 125 + (m - 1) * 25), Color.White, 0f, FontAssets.DeathText.Value.MeasureString(strArr) / 2, new Vector2(0.3f), -1, 1);
                     }
                     int n = 0;
                     foreach (string strArr in severities)
                     {
                         n++;
-                        ChatManager.DrawColorCodedStringWithShadow(Main.spriteBatch, Main.fontDeathText, strArr, new Vector2(center.Item1, center.Item2 - 75 + (n - 1) * 25), Color.White, 0f, Main.fontDeathText.MeasureString(strArr) / 2, new Vector2(0.3f), -1, 1);
+                        ChatManager.DrawColorCodedStringWithShadow(Main.spriteBatch, FontAssets.DeathText.Value, strArr, new Vector2(center.Item1, center.Item2 - 75 + (n - 1) * 25), Color.White, 0f, FontAssets.DeathText.Value.MeasureString(strArr) / 2, new Vector2(0.3f), -1, 1);
                     }
                     int p = 0;
                     foreach (string strArr in durations)
                     {
                         p++;
-                        ChatManager.DrawColorCodedStringWithShadow(Main.spriteBatch, Main.fontDeathText, strArr, new Vector2(center.Item1, center.Item2 - 25 + (p - 1) * 25), Color.White, 0f, Main.fontDeathText.MeasureString(strArr) / 2, new Vector2(0.3f), -1, 1);
+                        ChatManager.DrawColorCodedStringWithShadow(Main.spriteBatch, FontAssets.DeathText.Value, strArr, new Vector2(center.Item1, center.Item2 - 25 + (p - 1) * 25), Color.White, 0f, FontAssets.DeathText.Value.MeasureString(strArr) / 2, new Vector2(0.3f), -1, 1);
                     }
                     break;
             }
             if (ScrollUI != ScrollUIMode.Main)
             {
                 if (GoBackInScrollUI.GetAssignedKeys().Count == 0)
-                    ChatManager.DrawColorCodedStringWithShadow(Main.spriteBatch, Main.fontDeathText, $"Please assign a hotkey to return.", new Vector2(center.Item1, center.Item2 + 150), Color.White, 0f, Main.fontDeathText.MeasureString($"Please assign a hotkey to return.") / 2, new Vector2(0.3f), -1, 1);
+                    ChatManager.DrawColorCodedStringWithShadow(Main.spriteBatch, FontAssets.DeathText.Value, $"Please assign a hotkey to return.", new Vector2(center.Item1, center.Item2 + 150), Color.White, 0f, FontAssets.DeathText.Value.MeasureString($"Please assign a hotkey to return.") / 2, new Vector2(0.3f), -1, 1);
                 else
-                    ChatManager.DrawColorCodedStringWithShadow(Main.spriteBatch, Main.fontDeathText, $"Press {GoBackInScrollUI.GetAssignedKeys()[0]} to return", new Vector2(center.Item1, center.Item2 + 150), Color.White, 0f, Main.fontDeathText.MeasureString($"Press {GoBackInScrollUI.GetAssignedKeys()[0]} to return") / 2, new Vector2(0.3f), -1, 1);
+                    ChatManager.DrawColorCodedStringWithShadow(Main.spriteBatch, FontAssets.DeathText.Value, $"Press {GoBackInScrollUI.GetAssignedKeys()[0]} to return", new Vector2(center.Item1, center.Item2 + 150), Color.White, 0f, FontAssets.DeathText.Value.MeasureString($"Press {GoBackInScrollUI.GetAssignedKeys()[0]} to return") / 2, new Vector2(0.3f), -1, 1);
                 string ind2 = "'R:' indicates rarity\n'S:' indicates severity\n'D:' indicates duration";
-                ChatManager.DrawColorCodedStringWithShadow(Main.spriteBatch, Main.fontDeathText, warnings, new Vector2(center.Item1, center.Item2 + 125), Color.White, 0f, Main.fontDeathText.MeasureString(warnings) / 2, new Vector2(0.3f), -1, 1);
-                if (ScrollUI == ScrollUIMode.Index) ChatManager.DrawColorCodedStringWithShadow(Main.spriteBatch, Main.fontDeathText, ind2, new Vector2(center.Item1, center.Item2 + 75), Color.White, 0f, Main.fontDeathText.MeasureString(ind2) / 2, new Vector2(0.3f), -1, 1);
+                ChatManager.DrawColorCodedStringWithShadow(Main.spriteBatch, FontAssets.DeathText.Value, warnings, new Vector2(center.Item1, center.Item2 + 125), Color.White, 0f, FontAssets.DeathText.Value.MeasureString(warnings) / 2, new Vector2(0.3f), -1, 1);
+                if (ScrollUI == ScrollUIMode.Index) ChatManager.DrawColorCodedStringWithShadow(Main.spriteBatch, FontAssets.DeathText.Value, ind2, new Vector2(center.Item1, center.Item2 + 75), Color.White, 0f, FontAssets.DeathText.Value.MeasureString(ind2) / 2, new Vector2(0.3f), -1, 1);
             }
             #endregion
             if (beginAndEnd) Main.spriteBatch.End();

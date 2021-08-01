@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using Microsoft.Xna.Framework.Input;
 using ReLogic.Graphics;
 using Terraria.ModLoader;
+using Microsoft.Xna.Framework.Graphics;
 
 namespace NDMod.Common.Utilities
 {
@@ -43,6 +44,15 @@ namespace NDMod.Common.Utilities
         public static (int, int) GetScreenCenter()
         {
             return (Main.screenWidth / 2, Main.screenHeight / 2);
+        }
+
+        public static Texture2D GetTexture(this Mod mod, string path)
+        {
+            return mod.Assets.Request<Texture2D>(path, ReLogic.Content.AssetRequestMode.ImmediateLoad).Value;
+        }
+        public static Effect GetEffect(this Mod mod, string path)
+        {
+            return mod.Assets.Request<Effect>(path, ReLogic.Content.AssetRequestMode.ImmediateLoad).Value;
         }
     }
 }

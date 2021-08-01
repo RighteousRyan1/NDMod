@@ -3,9 +3,11 @@ using Microsoft.Xna.Framework;
 using Terraria.ModLoader;
 using NDMod.Common;
 using Microsoft.Xna.Framework.Audio;
+using Terraria.DataStructures;
 
 namespace NDMod.Content.Disasters
 {
+    public class VortexSource : IProjectileSource { }
     public class VortexDisaster : ModDisaster
     {
         public override int MaxDuration => 8500;
@@ -32,9 +34,9 @@ namespace NDMod.Content.Disasters
             if ((spotX < Main.player[0].Center.X + 1000) && (spotX > Main.player[0].Center.X))
                 spotX = Main.player[0].Center.X + 1000;
 
-            Vector2 randSpot = new Vector2(spotX, spotY);
+            Vector2 randSpot = new(spotX, spotY);
 
-            var proj = Projectile.NewProjectileDirect(randSpot,
+            var proj = Projectile.NewProjectileDirect(new VortexSource(), randSpot,
                 Vector2.Zero,
                 Main.rand.Next(2) == 0 ? ModContent.ProjectileType<Projectiles.VortexPurple>() : ModContent.ProjectileType<Projectiles.VortexCyan>(),
                 0, 0);
